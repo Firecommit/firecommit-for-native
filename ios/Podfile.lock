@@ -1,9 +1,6 @@
 PODS:
   - boost (1.76.0)
   - CocoaAsyncSocket (7.6.5)
-  - CocoaLumberjack (3.7.2):
-    - CocoaLumberjack/Core (= 3.7.2)
-  - CocoaLumberjack/Core (3.7.2)
   - DoubleConversion (1.1.6)
   - EXConstants (11.0.2):
     - ExpoModulesCore
@@ -366,9 +363,6 @@ PODS:
     - React-perflogger (= 0.66.2)
   - RNBackgroundFetch (4.0.4):
     - React-Core
-  - RNBackgroundGeolocation (4.4.2):
-    - CocoaLumberjack (~> 3.7.2)
-    - React-Core
   - RNScreens (3.9.0):
     - React-Core
     - React-RCTImage
@@ -444,7 +438,6 @@ DEPENDENCIES:
   - React-runtimeexecutor (from `../node_modules/react-native/ReactCommon/runtimeexecutor`)
   - ReactCommon/turbomodule/core (from `../node_modules/react-native/ReactCommon`)
   - RNBackgroundFetch (from `../node_modules/react-native-background-fetch`)
-  - RNBackgroundGeolocation (from `../node_modules/react-native-background-geolocation`)
   - RNScreens (from `../node_modules/react-native-screens`)
   - UMAppLoader (from `../node_modules/unimodules-app-loader/ios`)
   - "UMCore (from `../node_modules/@unimodules/core/ios`)"
@@ -455,7 +448,6 @@ DEPENDENCIES:
 SPEC REPOS:
   trunk:
     - CocoaAsyncSocket
-    - CocoaLumberjack
     - Flipper
     - Flipper-Boost-iOSX
     - Flipper-DoubleConversion
@@ -543,8 +535,6 @@ EXTERNAL SOURCES:
     :path: "../node_modules/react-native/ReactCommon"
   RNBackgroundFetch:
     :path: "../node_modules/react-native-background-fetch"
-  RNBackgroundGeolocation:
-    :path: "../node_modules/react-native-background-geolocation"
   RNScreens:
     :path: "../node_modules/react-native-screens"
   UMAppLoader:
@@ -561,7 +551,6 @@ EXTERNAL SOURCES:
 SPEC CHECKSUMS:
   boost: a7c83b31436843459a1961bfd74b96033dc77234
   CocoaAsyncSocket: 065fd1e645c7abab64f7a6a2007a48038fdc6a99
-  CocoaLumberjack: b7e05132ff94f6ae4dfa9d5bce9141893a21d9da
   DoubleConversion: 831926d9b8bf8166fd87886c4abab286c2422662
   EXConstants: 4cb52b6d8f636c767104a44bf7db3873e9c01a6f
   EXFileSystem: 0a04aba8da751b9ac954065911bcf166503f8267
@@ -609,7 +598,6 @@ SPEC CHECKSUMS:
   React-runtimeexecutor: 393e26602c1b248683372051e34db63e359e3b01
   ReactCommon: c0263c1a41509aeb94be3214fa7bc3b71eae5ef6
   RNBackgroundFetch: 4ba650701219cf06fdc08336cc0b010242d2d024
-  RNBackgroundGeolocation: 8a4bc1a05681e4c6af180a07d9e6f396670e1e82
   RNScreens: 4d79118be80f79fa1f4aa131909a1d6e86280af3
   UMAppLoader: 21af63390e55c82e037fb9752d93114a80ecf16e
   UMCore: ce3a4faa010239063b8343895b29a6d97b01069d
