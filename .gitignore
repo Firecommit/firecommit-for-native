@@ -61,3 +61,6 @@ buck-out/
 
 # Development
 .env
+
+# Firebase API Setting
+GoogleService-Info.plist
