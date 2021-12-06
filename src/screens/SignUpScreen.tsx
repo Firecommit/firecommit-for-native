@@ -33,18 +33,20 @@ export const SignUpScreen = ({ navigation }: AuthProps) => {
         });
         db.ref(`users/${user?.uid}`)
           .set(data)
-          .catch((e) => {
-            console.log(e);
+          .catch((error) => {
+            throw error;
           });
       })
       .catch((error) => {
-        console.log(error);
+        throw error;
       });
   };
 
   return (
     <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
-      <Headline style={{ marginBottom: 16 }}>アカウント作成</Headline>
+      <Headline style={{ marginBottom: 16, fontWeight: 'bold' }}>
+        アカウント作成
+      </Headline>
       <View style={{ width: '100%', paddingHorizontal: 16, marginBottom: 16 }}>
         <TextInput
           label="氏名"
