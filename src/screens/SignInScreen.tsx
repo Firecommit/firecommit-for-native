@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useContext, useState } from 'react';
 import { View } from 'react-native';
 import {
   Button,
@@ -8,26 +8,19 @@ import {
   useTheme,
 } from 'react-native-paper';
 import { Link } from '@react-navigation/native';
-import { AuthProps } from '../types';
-import { auth } from '../../firebase';
+import { AuthContext } from '../contexts/AuthProvider';
 
-export const SignInScreen = ({ navigation }: AuthProps) => {
+export const SignInScreen = () => {
+  const { signin } = useContext(AuthContext);
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const theme = useTheme();
 
-  const onSignIn = () => {
-    auth
-      .signInWithEmailAndPassword(email, password)
-      .then(() => {})
-      .catch((error) => {
-        console.log(error);
-      });
-  };
-
   return (
     <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
-      <Headline style={{ marginBottom: 16 }}>サインイン</Headline>
+      <Headline style={{ marginBottom: 16, fontWeight: 'bold' }}>
+        サインイン
+      </Headline>
       <View style={{ width: '100%', paddingHorizontal: 16, marginBottom: 16 }}>
         <TextInput
           label="メールアドレス"
@@ -45,7 +38,7 @@ export const SignInScreen = ({ navigation }: AuthProps) => {
           onChangeText={(text) => setPassword(text)}
           style={{ marginBottom: 16 }}
         />
-        <Button mode="contained" onPress={() => onSignIn()}>
+        <Button mode="contained" onPress={() => signin(email, password)}>
           サインイン
         </Button>
       </View>
