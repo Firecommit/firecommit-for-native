@@ -7,64 +7,31 @@
  *
  * @format
  */
-import React, { useContext, FC } from 'react';
+import React from 'react';
+import 'react-native-gesture-handler';
 import { NavigationContainer } from '@react-navigation/native';
-import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
+import { Provider as PaperProvider } from 'react-native-paper';
+import { AuthProvider } from './src/contexts/AuthProvider';
+import { JoinedProvider } from './src/contexts/JoinedProvider';
 
-import { JoinScreen } from './src/screens/JoinScreen';
-import { MapScreen } from './src/screens/MapScreen';
-import { UserScreen } from './src/screens/UserScreen';
-import { SignInScreen } from './src/screens/SignInScreen';
-import { SignUpScreen } from './src/screens/SignUpScreen';
-
-import { AuthProvider, AuthContext } from './src/contexts/AuthProvider';
-import { JoinedProvider, JoinedContext } from './src/contexts/JoinedProvider';
-
-const InnerApp: FC = () => {
-  const { isSignedIn } = useContext(AuthContext);
-  const { isJoined } = useContext(JoinedContext);
-  const Stack = createNativeStackNavigator();
-
-  return (
-    <SafeAreaProvider>
-      <NavigationContainer>
-        <Stack.Navigator screenOptions={{ headerShown: false }}>
-          {isSignedIn ? (
-            isJoined ? (
-              <>
-                <Stack.Screen
-                  name="Map"
-                  component={MapScreen}
-                  options={{ headerShown: true }}
-                />
-                <Stack.Screen
-                  name="User"
-                  component={UserScreen}
-                  options={{ headerShown: true }}
-                />
-              </>
-            ) : (
-              <Stack.Screen name="Join" component={JoinScreen} />
-            )
-          ) : (
-            <>
-              <Stack.Screen name="SignIn" component={SignInScreen} />
-              <Stack.Screen name="SignUp" component={SignUpScreen} />
-            </>
-          )}
-        </Stack.Navigator>
-      </NavigationContainer>
-    </SafeAreaProvider>
-  );
-};
+import { StackNavigator } from './src/stack';
+import { AsyncStorageProvider } from './src/contexts/AsyncStorageProvider';
 
 export const App = () => {
   return (
-    <AuthProvider>
-      <JoinedProvider>
-        <InnerApp />
-      </JoinedProvider>
-    </AuthProvider>
+    <SafeAreaProvider>
+      <PaperProvider>
+        <AsyncStorageProvider>
+          <AuthProvider>
+            <JoinedProvider>
+              <NavigationContainer>
+                <StackNavigator />
+              </NavigationContainer>
+            </JoinedProvider>
+          </AuthProvider>
+        </AsyncStorageProvider>
+      </PaperProvider>
+    </SafeAreaProvider>
   );
 };
