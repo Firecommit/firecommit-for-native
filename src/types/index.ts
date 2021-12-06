@@ -3,7 +3,6 @@ import { NativeStackScreenProps } from '@react-navigation/native-stack';
 type AuthRootStackParamList = {
   SignIn: undefined;
   SignUp: undefined;
-  Join: undefined;
 };
 
 export type AuthProps = NativeStackScreenProps<AuthRootStackParamList>;
