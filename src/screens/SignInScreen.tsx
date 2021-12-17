@@ -37,6 +37,7 @@ export const SignInScreen = () => {
           value={password}
           onChangeText={(text) => setPassword(text)}
           style={{ marginBottom: 16 }}
+          secureTextEntry
         />
         <Button mode="contained" onPress={() => signin(email, password)}>
           サインイン

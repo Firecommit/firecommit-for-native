@@ -13,7 +13,7 @@ import { NavigationContainer } from '@react-navigation/native';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 import { Provider as PaperProvider } from 'react-native-paper';
 import { AuthProvider } from './src/contexts/AuthProvider';
-import { JoinedProvider } from './src/contexts/JoinedProvider';
+import { ServerProvider } from './src/contexts/ServerProvider';
 
 import { StackNavigator } from './src/stack';
 import { AsyncStorageProvider } from './src/contexts/AsyncStorageProvider';
@@ -24,11 +24,11 @@ export const App = () => {
       <PaperProvider>
         <AsyncStorageProvider>
           <AuthProvider>
-            <JoinedProvider>
+            <ServerProvider>
               <NavigationContainer>
                 <StackNavigator />
               </NavigationContainer>
-            </JoinedProvider>
+            </ServerProvider>
           </AuthProvider>
         </AsyncStorageProvider>
       </PaperProvider>

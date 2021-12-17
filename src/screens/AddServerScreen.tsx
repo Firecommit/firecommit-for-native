@@ -1,12 +1,12 @@
 import React, { useContext, useState } from 'react';
 import { View } from 'react-native';
 import { Caption, Headline, TextInput, Button } from 'react-native-paper';
-import { JoinedContext } from '../contexts/JoinedProvider';
-import { NavigationProps } from '../types';
+import { ServerContext } from '../contexts/ServerProvider';
+import { DrawerProps } from '../types';
 
-export const JoinScreen = ({ navigation }: NavigationProps) => {
-  const [invCode, setInvCode] = useState<string>();
-  const { onJoined } = useContext(JoinedContext);
+export const AddServerScreen = ({ navigation }: DrawerProps) => {
+  const [invCode, setInvCode] = useState<string>('');
+  const { LoginServer } = useContext(ServerContext);
 
   return (
     <View
@@ -17,6 +17,14 @@ export const JoinScreen = ({ navigation }: NavigationProps) => {
         marginTop: 64,
       }}
     >
+      <Button
+        style={{ marginRight: 'auto' }}
+        icon="chevron-left"
+        mode="text"
+        onPress={() => navigation.navigate('Tab')}
+      >
+        戻る
+      </Button>
       <Headline style={{ marginBottom: 16 }}>マップサーバーへ参加</Headline>
       <Caption>
         マップサーバーは、あなたやスタッフが働く様子を映す場所です。
@@ -35,8 +43,16 @@ export const JoinScreen = ({ navigation }: NavigationProps) => {
           value={invCode}
           onChangeText={(text) => setInvCode(text)}
           style={{ marginBottom: 32 }}
+          autoCapitalize="none"
         />
-        <Button mode="contained" onPress={() => onJoined(true)}>
+        <Button
+          mode="contained"
+          onPress={() => {
+            LoginServer(invCode);
+            navigation.navigate('Tab');
+          }}
+          disabled={!invCode || !invCode.match(/\S/g)}
+        >
           サーバーに参加する
         </Button>
       </View>

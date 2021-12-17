@@ -1,16 +1,16 @@
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
+import { DrawerScreenProps } from '@react-navigation/drawer';
 
-type AuthRootStackParamList = {
-  SignIn: undefined;
-  SignUp: undefined;
+type RootStackParamList = {
+  Join: undefined;
+  Drawer: undefined;
 };
 
-export type AuthProps = NativeStackScreenProps<AuthRootStackParamList>;
+export type StackProps = NativeStackScreenProps<RootStackParamList>;
 
-type NavigationRootStackParamList = {
-  Map: undefined;
-  User: undefined;
+type RootDrawerParamList = {
+  Add: undefined;
+  Tab: undefined;
 };
 
-export type NavigationProps =
-  NativeStackScreenProps<NavigationRootStackParamList>;
+export type DrawerProps = DrawerScreenProps<RootDrawerParamList>;
