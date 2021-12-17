@@ -1,16 +1,22 @@
 import React, { useContext } from 'react';
-import { View } from 'react-native';
-import { Button, Headline } from 'react-native-paper';
+import { Dimensions, View } from 'react-native';
+import { WebView } from 'react-native-webview';
 import { AuthContext } from '../contexts/AuthProvider';
 
 export const MapScreen = () => {
-  const { signout } = useContext(AuthContext);
+  const { signout, currentUser } = useContext(AuthContext);
   return (
-    <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
-      <Headline>Map Page</Headline>
-      <Button mode="contained" onPress={() => signout()}>
-        サインアウト
-      </Button>
+    <View
+      style={{
+        width: Dimensions.get('screen').width,
+        height: Dimensions.get('screen').height,
+      }}
+    >
+      <WebView
+        originWhitelist={['*']}
+        scrollEnabled={false}
+        source={{ uri: `http://localhost:3000` }}
+      />
     </View>
   );
 };

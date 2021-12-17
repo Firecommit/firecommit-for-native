@@ -1,10 +1,13 @@
-import React, { createContext, FC, useEffect, useMemo, useState } from 'react';
+import React, { createContext, FC, useEffect, useState } from 'react';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 export type AsyncDataProps = {
   '@remember'?: string;
+  '@name'?: string;
   '@email'?: string;
   '@password'?: string;
+  '@server'?: string;
+  '@code'?: string;
 };
 
 type StorageDataOptions = {
@@ -19,7 +22,7 @@ type AsyncStorageProps = {
   storageData: (
     option: StorageDataOptions
   ) => Promise<AsyncDataProps | undefined>;
-  storage: AsyncDataProps;
+  storage?: AsyncDataProps;
 };
 
 const storageData = async (option: StorageDataOptions) => {
@@ -53,23 +56,21 @@ const storageData = async (option: StorageDataOptions) => {
 
 export const AsyncStorageContext = createContext<AsyncStorageProps>({
   storageData,
-  storage: {},
+  storage: undefined,
 });
 
 export const AsyncStorageProvider: FC = ({ children }) => {
-  const [storage, setStorage] = useState<AsyncDataProps>({});
+  const [storage, setStorage] = useState<AsyncDataProps>();
 
   useEffect(() => {
     storageData({ mode: 'get_all' }).then((data) => {
-      if (data) {
-        setStorage(data);
-      }
+      setStorage(data);
     });
   }, []);
 
   return (
     <AsyncStorageContext.Provider value={{ storageData, storage }}>
-      {Object.keys(storage).length ? children : <></>}
+      {storage !== undefined ? children : <></>}
     </AsyncStorageContext.Provider>
   );
 };

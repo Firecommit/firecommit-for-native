@@ -1,25 +1,28 @@
 import React, { useContext, FC } from 'react';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { AuthContext } from './contexts/AuthProvider';
-import { JoinedContext } from './contexts/JoinedProvider';
 import { DrawerNavigator } from './drawer';
 
-import { JoinScreen } from './screens/JoinScreen';
+import { LoginServerScreen } from './screens/LoginServerScreen';
 import { SignInScreen } from './screens/SignInScreen';
 import { SignUpScreen } from './screens/SignUpScreen';
+import { ServerContext } from './contexts/ServerProvider';
 
 export const StackNavigator: FC = () => {
   const { isSignedIn } = useContext(AuthContext);
-  const { isJoined } = useContext(JoinedContext);
+  const { isLogin } = useContext(ServerContext);
   const Stack = createNativeStackNavigator();
 
   return (
-    <Stack.Navigator screenOptions={{ headerShown: false }}>
+    <Stack.Navigator
+      initialRouteName="Drawer"
+      screenOptions={{ headerShown: false }}
+    >
       {isSignedIn ? (
-        isJoined ? (
+        isLogin ? (
           <Stack.Screen name="Drawer" component={DrawerNavigator} />
         ) : (
-          <Stack.Screen name="Join" component={JoinScreen} />
+          <Stack.Screen name="Join" component={LoginServerScreen} />
         )
       ) : (
         <>
