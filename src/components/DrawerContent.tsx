@@ -1,6 +1,6 @@
 import React, { useContext } from 'react';
 import { View } from 'react-native';
-import { Headline, Drawer, Text } from 'react-native-paper';
+import { Headline, Drawer, List } from 'react-native-paper';
 import {
   DrawerContentComponentProps,
   DrawerContentScrollView,
@@ -11,18 +11,35 @@ import { AuthContext } from '../contexts/AuthProvider';
 import { ServerContext } from '../contexts/ServerProvider';
 
 export const DrawerContent = (props: DrawerContentComponentProps) => {
-  const { signout } = useContext(AuthContext);
-  const { data, LogoutServer } = useContext(ServerContext);
+  const { currentUser, signout } = useContext(AuthContext);
+  const { data, LoginServer, LogoutServer, getServerName } =
+    useContext(ServerContext);
 
   return (
-    <View style={{ flex: 1, padding: 16, paddingTop: 52 }}>
-      <Headline style={{ fontWeight: 'bold', marginBottom: 16 }}>
+    <View style={{ flex: 1, paddingTop: 52 }}>
+      <Headline style={{ fontWeight: 'bold', paddingHorizontal: 16 }}>
         マップサーバー
       </Headline>
       <DrawerContentScrollView {...props}>
-        <View>
-          <Text>{data?.name}</Text>
-        </View>
+        <List.Section>
+          {Object.keys({ ...currentUser.data?.workspace }).map((key) => (
+            <List.Item
+              style={
+                data?.name === getServerName(key)
+                  ? { backgroundColor: '#eee' }
+                  : {}
+              }
+              key={key}
+              title={getServerName(key)}
+              description={key}
+              left={() => <List.Icon icon="folder" />}
+              onPress={() => {
+                LoginServer(key);
+                props.navigation.navigate('Tab');
+              }}
+            />
+          ))}
+        </List.Section>
       </DrawerContentScrollView>
       <Drawer.Section
         style={{

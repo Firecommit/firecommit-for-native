@@ -7,9 +7,19 @@ import React, {
 } from 'react';
 import firebase, { auth, db } from '../../firebase';
 import { AsyncStorageContext } from './AsyncStorageProvider';
-import { ServerContext } from './ServerProvider';
 
-type UserProps = firebase.User | null | undefined;
+type UserProps = {
+  auth?: firebase.User | null;
+  data?: {
+    coordinate: {
+      x: number;
+      y: number;
+    };
+    workspace: {
+      [key: string]: boolean;
+    };
+  };
+};
 
 type AuthContextProps = {
   currentUser: UserProps;
@@ -20,7 +30,7 @@ type AuthContextProps = {
 };
 
 export const AuthContext = createContext<AuthContextProps>({
-  currentUser: undefined,
+  currentUser: { auth: undefined, data: undefined },
   isSignedIn: false,
   signup: (name = '', email = '', password = '') => {},
   signin: (email = '', password = '') => {},
@@ -28,7 +38,10 @@ export const AuthContext = createContext<AuthContextProps>({
 });
 
 export const AuthProvider: FC = ({ children }) => {
-  const [currentUser, setCurrentUser] = useState<UserProps>();
+  const [currentUser, setCurrentUser] = useState<UserProps>({
+    auth: undefined,
+    data: undefined,
+  });
   const { storageData, storage } = useContext(AsyncStorageContext);
   const [isSignedIn, setIsSignedIn] = useState(
     storage?.['@remember'] === 'true'
@@ -40,6 +53,7 @@ export const AuthProvider: FC = ({ children }) => {
         x: 0,
         y: 0,
       },
+      workspace: {},
     };
     auth
       .createUserWithEmailAndPassword(email, password)
@@ -72,7 +86,8 @@ export const AuthProvider: FC = ({ children }) => {
   const signin = (email: string, password: string) => {
     auth
       .signInWithEmailAndPassword(email, password)
-      .then(() => {
+      .then((userCredential) => {
+        const { user } = userCredential;
         storageData({
           mode: 'set',
           attributes: { key: '@remember', val: 'true' },
@@ -83,6 +98,10 @@ export const AuthProvider: FC = ({ children }) => {
           attributes: { key: '@password', val: password },
         });
         setIsSignedIn(true);
+
+        db.ref(`users/${user?.uid}`).on('value', (snapshot) => {
+          setCurrentUser({ auth: user, data: snapshot.val() });
+        });
       })
       .catch((error) => {
         throw error;
@@ -110,10 +129,6 @@ export const AuthProvider: FC = ({ children }) => {
       }
     }
   }, []);
-
-  useEffect(() => {
-    auth.onAuthStateChanged((user) => setCurrentUser(user));
-  }, [currentUser]);
 
   return (
     <AuthContext.Provider
