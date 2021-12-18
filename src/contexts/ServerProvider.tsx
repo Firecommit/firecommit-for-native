@@ -7,6 +7,7 @@ import React, {
 } from 'react';
 import { AsyncStorageContext } from './AsyncStorageProvider';
 import { db } from '../../firebase';
+import { AuthContext } from './AuthProvider';
 
 type DataProps = {
   adminUserId: string;
@@ -17,24 +18,47 @@ type DataProps = {
 
 type ServerProps = {
   data?: DataProps;
-  LoginServer: (code: string) => void;
   isLogin: boolean;
+  LoginServer: (code: string) => void;
   LogoutServer: () => void;
+  getServerName: (code: string) => string | undefined;
 };
 
 export const ServerContext = createContext<ServerProps>({
   data: undefined,
-  LoginServer: (code: string) => {},
   isLogin: false,
+  LoginServer: (code: string) => {},
   LogoutServer: () => {},
+  getServerName: (code: string) => '',
 });
 
 export const ServerProvider: FC = ({ children }) => {
   const [data, setData] = useState<DataProps>();
   const { storage, storageData } = useContext(AsyncStorageContext);
   const [isLogin, setIsLogin] = useState(storage?.['@server'] === 'true');
+  const { currentUser } = useContext(AuthContext);
+
+  const getServerName = (code: string) => {
+    let name;
+    db.ref(`workspace/${code}`).on('value', (snapshot) => {
+      name = snapshot.val().name;
+    });
+    return name;
+  };
 
   const LoginServer = (code: string) => {
+    db.ref(`users/${currentUser?.auth?.uid}`)
+      .child('workspace')
+      .update({
+        [code]: true,
+      });
+
+    db.ref(`workspace/${code}`)
+      .child('members')
+      .update({
+        [`${currentUser?.auth?.uid}`]: true,
+      });
+
     db.ref(`workspace/${code}`).on('value', (snapshot) => {
       setData(snapshot.val());
       storageData({
@@ -70,7 +94,7 @@ export const ServerProvider: FC = ({ children }) => {
 
   return (
     <ServerContext.Provider
-      value={{ data, LoginServer, isLogin, LogoutServer }}
+      value={{ data, isLogin, LoginServer, LogoutServer, getServerName }}
     >
       {children}
     </ServerContext.Provider>
