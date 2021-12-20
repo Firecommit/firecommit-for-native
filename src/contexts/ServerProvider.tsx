@@ -10,6 +10,7 @@ import { db } from '../../firebase';
 import { AuthContext } from './AuthProvider';
 
 type DataProps = {
+  id: string;
   adminUserId: string;
   inAudit: boolean;
   members: { [key: string]: boolean };
@@ -47,11 +48,19 @@ export const ServerProvider: FC = ({ children }) => {
   };
 
   const LoginServer = (code: string) => {
-    db.ref(`users/${currentUser?.auth?.uid}`)
-      .child('workspace')
-      .update({
-        [code]: true,
-      });
+    const usersWrokspaceRef = db
+      .ref(`users/${currentUser?.auth?.uid}`)
+      .child('workspace');
+
+    let updateData = {};
+    usersWrokspaceRef.on('value', (snapshot) => {
+      updateData = Object.fromEntries(
+        Object.keys({ ...snapshot.val(), [code]: true }).map((key) =>
+          key === code ? [key, true] : [key, false]
+        )
+      );
+    });
+    usersWrokspaceRef.update(updateData);
 
     db.ref(`workspace/${code}`)
       .child('members')
@@ -60,7 +69,7 @@ export const ServerProvider: FC = ({ children }) => {
       });
 
     db.ref(`workspace/${code}`).on('value', (snapshot) => {
-      setData(snapshot.val());
+      setData({ ...snapshot.val(), id: code });
       storageData({
         mode: 'set',
         attributes: { key: '@server', val: 'true' },
