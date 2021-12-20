@@ -24,11 +24,7 @@ export const DrawerContent = (props: DrawerContentComponentProps) => {
         <List.Section>
           {Object.keys({ ...currentUser.data?.workspace }).map((key) => (
             <List.Item
-              style={
-                data?.name === getServerName(key)
-                  ? { backgroundColor: '#eee' }
-                  : {}
-              }
+              style={data?.id === key ? { backgroundColor: '#eee' } : {}}
               key={key}
               title={getServerName(key)}
               description={key}
