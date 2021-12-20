@@ -27,6 +27,7 @@ type AuthContextProps = {
   signup: (name: string, email: string, password: string) => void;
   signin: (email: string, password: string) => void;
   signout: () => void;
+  update: (type: 'name' | 'email' | 'password', val: string) => Promise<void>;
 };
 
 export const AuthContext = createContext<AuthContextProps>({
@@ -35,6 +36,7 @@ export const AuthContext = createContext<AuthContextProps>({
   signup: (name = '', email = '', password = '') => {},
   signin: (email = '', password = '') => {},
   signout: () => {},
+  update: async () => {},
 });
 
 export const AuthProvider: FC = ({ children }) => {
@@ -46,6 +48,36 @@ export const AuthProvider: FC = ({ children }) => {
   const [isSignedIn, setIsSignedIn] = useState(
     storage?.['@remember'] === 'true'
   );
+
+  const update = async (type: 'name' | 'email' | 'password', val: string) => {
+    const credential = firebase.auth.EmailAuthProvider.credential(
+      `${storage?.['@email']}`,
+      `${storage?.['@password']}`
+    );
+    auth.currentUser?.reauthenticateWithCredential(credential).then(() => {
+      switch (type) {
+        case 'name':
+          auth.currentUser?.updateProfile({ displayName: val });
+          break;
+        case 'email':
+          auth.currentUser?.updateEmail(val);
+          storageData({
+            mode: 'set',
+            attributes: { key: '@email', val },
+          });
+          break;
+        case 'password':
+          auth.currentUser?.updatePassword(val);
+          storageData({
+            mode: 'set',
+            attributes: { key: '@password', val },
+          });
+          break;
+        default:
+          break;
+      }
+    });
+  };
 
   const signup = (name: string, email: string, password: string) => {
     const data = {
@@ -138,6 +170,7 @@ export const AuthProvider: FC = ({ children }) => {
         signup,
         signin,
         signout,
+        update,
       }}
     >
       {children}
