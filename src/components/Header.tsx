@@ -2,8 +2,7 @@ import { ParamListBase } from '@react-navigation/core';
 import { DrawerNavigationProp } from '@react-navigation/drawer';
 import React from 'react';
 import { TouchableOpacity } from 'react-native';
-import { Appbar, Avatar, useTheme } from 'react-native-paper';
-import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
+import { Appbar, Avatar, Title, useTheme } from 'react-native-paper';
 
 export const Header = ({
   navigation,
@@ -27,6 +26,7 @@ export const Header = ({
         onPress={() => {
           navigation.openDrawer();
         }}
+        style={{ marginLeft: 16, marginRight: 8 }}
       >
         <Avatar.Image
           size={40}
@@ -35,7 +35,8 @@ export const Header = ({
           }}
         />
       </TouchableOpacity>
-      <Appbar.Content
+      <Title>山羽歯科医院</Title>
+      {/*       <Appbar.Content
         title={
           <MaterialCommunityIcons
             name="twitter"
@@ -43,7 +44,7 @@ export const Header = ({
             color={theme.colors.primary}
           />
         }
-      />
+      /> */}
     </Appbar.Header>
   );
 };

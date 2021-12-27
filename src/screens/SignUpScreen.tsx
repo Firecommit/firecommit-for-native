@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useContext, useState } from 'react';
 import { View } from 'react-native';
 import {
   Button,
@@ -8,39 +8,14 @@ import {
   useTheme,
 } from 'react-native-paper';
 import { Link } from '@react-navigation/native';
-import { AuthProps } from '../types';
-import { auth, db } from '../../firebase';
+import { AuthContext } from '../contexts/AuthProvider';
 
-export const SignUpScreen = ({ navigation }: AuthProps) => {
+export const SignUpScreen = () => {
+  const { signup } = useContext(AuthContext);
   const [name, setName] = useState<string>('');
   const [email, setEmail] = useState<string>('');
   const [password, setPassword] = useState<string>('');
   const theme = useTheme();
-
-  const onSignUp = () => {
-    const data = {
-      coordinate: {
-        x: 0,
-        y: 0,
-      },
-    };
-    auth
-      .createUserWithEmailAndPassword(email, password)
-      .then((userCredential) => {
-        const { user } = userCredential;
-        user?.updateProfile({
-          displayName: name,
-        });
-        db.ref(`users/${user?.uid}`)
-          .set(data)
-          .catch((error) => {
-            throw error;
-          });
-      })
-      .catch((error) => {
-        throw error;
-      });
-  };
 
   return (
     <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
@@ -70,8 +45,9 @@ export const SignUpScreen = ({ navigation }: AuthProps) => {
           value={password}
           onChangeText={(text) => setPassword(text)}
           style={{ marginBottom: 16 }}
+          secureTextEntry
         />
-        <Button mode="contained" onPress={() => onSignUp()}>
+        <Button mode="contained" onPress={() => signup(name, email, password)}>
           アカウント作成
         </Button>
       </View>
