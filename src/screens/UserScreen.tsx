@@ -3,9 +3,11 @@ import { View, Text } from 'react-native';
 import { ScrollView } from 'react-native-gesture-handler';
 import { Button, List, TextInput } from 'react-native-paper';
 import { AuthContext } from '../contexts/AuthProvider';
+import { DialogContext } from '../contexts/DialogProvider';
 
 export const UserScreen = () => {
   const { currentUser, update } = useContext(AuthContext);
+  const { displayError, showDialog } = useContext(DialogContext);
   const [name, setName] = useState<string>(`${currentUser.auth?.displayName}`);
   const [email, setEmail] = useState<string>(`${currentUser.auth?.email}`);
   const [password, setPassword] = useState<string>('');
@@ -46,12 +48,17 @@ export const UserScreen = () => {
                 loading={loading.name}
                 onPress={() => {
                   setLoading((l) => ({ ...l, name: true }));
-                  update('name', name).then(() => {
-                    setTimeout(
-                      () => setLoading((l) => ({ ...l, name: false })),
-                      1000
-                    );
-                  });
+                  update('name', name)
+                    .then(() => {
+                      setTimeout(
+                        () => setLoading((l) => ({ ...l, name: false })),
+                        1000
+                      );
+                    })
+                    .catch((error) => {
+                      displayError(error);
+                      showDialog();
+                    });
                 }}
               >
                 更新
@@ -84,12 +91,17 @@ export const UserScreen = () => {
                 loading={loading.email}
                 onPress={() => {
                   setLoading((l) => ({ ...l, email: true }));
-                  update('email', email).then(() => {
-                    setTimeout(
-                      () => setLoading((l) => ({ ...l, email: false })),
-                      1000
-                    );
-                  });
+                  update('email', email)
+                    .then(() => {
+                      setTimeout(
+                        () => setLoading((l) => ({ ...l, email: false })),
+                        1000
+                      );
+                    })
+                    .catch((error) => {
+                      displayError(error);
+                      showDialog();
+                    });
                 }}
               >
                 更新
@@ -110,24 +122,30 @@ export const UserScreen = () => {
               }}
             >
               <TextInput
-                label="メールアドレス"
+                label="パスワード"
                 mode="flat"
                 value={password}
                 autoCapitalize="none"
                 onChangeText={(text) => setPassword(text)}
                 style={{ marginBottom: 16 }}
+                secureTextEntry
               />
               <Button
                 mode="contained"
                 loading={loading.password}
                 onPress={() => {
                   setLoading((l) => ({ ...l, password: true }));
-                  update('password', password).then(() => {
-                    setTimeout(
-                      () => setLoading((l) => ({ ...l, password: false })),
-                      1000
-                    );
-                  });
+                  update('password', password)
+                    .then(() => {
+                      setTimeout(
+                        () => setLoading((l) => ({ ...l, password: false })),
+                        1000
+                      );
+                    })
+                    .catch((error) => {
+                      displayError(error);
+                      showDialog();
+                    });
                 }}
               >
                 更新
