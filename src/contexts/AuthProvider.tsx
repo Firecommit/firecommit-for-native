@@ -7,6 +7,7 @@ import React, {
 } from 'react';
 import firebase, { auth, db } from '../../firebase';
 import { AsyncStorageContext } from './AsyncStorageProvider';
+import { DialogContext } from './DialogProvider';
 
 type UserProps = {
   auth?: firebase.User | null;
@@ -45,6 +46,7 @@ export const AuthProvider: FC = ({ children }) => {
     data: undefined,
   });
   const { storageData, storage } = useContext(AsyncStorageContext);
+  const { showDialog, displayError } = useContext(DialogContext);
   const [isSignedIn, setIsSignedIn] = useState(
     storage?.['@remember'] === 'true'
   );
@@ -97,7 +99,8 @@ export const AuthProvider: FC = ({ children }) => {
         db.ref(`users/${user?.uid}`)
           .set(data)
           .catch((error) => {
-            throw error;
+            displayError(error.message);
+            showDialog();
           });
         storageData({
           mode: 'set',
@@ -111,7 +114,8 @@ export const AuthProvider: FC = ({ children }) => {
         setIsSignedIn(true);
       })
       .catch((error) => {
-        throw error;
+        displayError(error.message);
+        showDialog();
       });
   };
 
@@ -136,20 +140,27 @@ export const AuthProvider: FC = ({ children }) => {
         });
       })
       .catch((error) => {
-        throw error;
+        displayError(error.message);
+        showDialog();
       });
   };
 
   const signout = () => {
-    auth.signOut().then(() => {
-      storageData({ mode: 'remove', attributes: { key: '@email' } });
-      storageData({ mode: 'remove', attributes: { key: '@password' } });
-      storageData({
-        mode: 'set',
-        attributes: { key: '@remember', val: 'false' },
+    auth
+      .signOut()
+      .then(() => {
+        storageData({ mode: 'remove', attributes: { key: '@email' } });
+        storageData({ mode: 'remove', attributes: { key: '@password' } });
+        storageData({
+          mode: 'set',
+          attributes: { key: '@remember', val: 'false' },
+        });
+        setIsSignedIn(false);
+      })
+      .catch((error) => {
+        displayError(error.message);
+        showDialog();
       });
-      setIsSignedIn(false);
-    });
   };
 
   useEffect(() => {

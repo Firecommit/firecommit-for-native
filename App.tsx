@@ -12,25 +12,31 @@ import 'react-native-gesture-handler';
 import { NavigationContainer } from '@react-navigation/native';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 import { Provider as PaperProvider } from 'react-native-paper';
+
+// Custom Provider
+import { DialogProvider } from './src/contexts/DialogProvider';
+import { AsyncStorageProvider } from './src/contexts/AsyncStorageProvider';
 import { AuthProvider } from './src/contexts/AuthProvider';
 import { ServerProvider } from './src/contexts/ServerProvider';
 
+// Main
 import { StackNavigator } from './src/stack';
-import { AsyncStorageProvider } from './src/contexts/AsyncStorageProvider';
 
 export const App = () => {
   return (
     <SafeAreaProvider>
       <PaperProvider>
-        <AsyncStorageProvider>
-          <AuthProvider>
-            <ServerProvider>
-              <NavigationContainer>
-                <StackNavigator />
-              </NavigationContainer>
-            </ServerProvider>
-          </AuthProvider>
-        </AsyncStorageProvider>
+        <DialogProvider>
+          <AsyncStorageProvider>
+            <AuthProvider>
+              <ServerProvider>
+                <NavigationContainer>
+                  <StackNavigator />
+                </NavigationContainer>
+              </ServerProvider>
+            </AuthProvider>
+          </AsyncStorageProvider>
+        </DialogProvider>
       </PaperProvider>
     </SafeAreaProvider>
   );
