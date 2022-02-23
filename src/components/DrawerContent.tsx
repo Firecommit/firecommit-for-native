@@ -1,6 +1,6 @@
 import React, { useContext } from 'react';
 import { View } from 'react-native';
-import { Headline, Drawer, List } from 'react-native-paper';
+import { Headline, Drawer, List, IconButton } from 'react-native-paper';
 import {
   DrawerContentComponentProps,
   DrawerContentScrollView,
@@ -12,8 +12,7 @@ import { ServerContext } from '../contexts/ServerProvider';
 
 export const DrawerContent = (props: DrawerContentComponentProps) => {
   const { currentUser, signout } = useContext(AuthContext);
-  const { data, LoginServer, LogoutServer, getServerName } =
-    useContext(ServerContext);
+  const { data, LoginServer, getServerName } = useContext(ServerContext);
 
   return (
     <View style={{ flex: 1, paddingTop: 52 }}>
@@ -29,6 +28,9 @@ export const DrawerContent = (props: DrawerContentComponentProps) => {
               title={getServerName(key)}
               description={key}
               left={() => <List.Icon icon="folder" />}
+              right={() => (
+                <IconButton icon="dots-vertical" size={18} onPress={() => {}} />
+              )}
               onPress={() => {
                 LoginServer(key);
                 props.navigation.navigate('Tab');
@@ -69,7 +71,6 @@ export const DrawerContent = (props: DrawerContentComponentProps) => {
           label="サインアウト"
           onPress={() => {
             signout();
-            LogoutServer();
           }}
         />
       </Drawer.Section>
