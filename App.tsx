@@ -9,18 +9,19 @@
  */
 import React from 'react';
 import 'react-native-gesture-handler';
-import { NavigationContainer } from '@react-navigation/native';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 import { Provider as PaperProvider } from 'react-native-paper';
+import { ActionSheetProvider } from '@expo/react-native-action-sheet';
 
 // Custom Provider
 import { DialogProvider } from './src/contexts/DialogProvider';
 import { AsyncStorageProvider } from './src/contexts/AsyncStorageProvider';
 import { AuthProvider } from './src/contexts/AuthProvider';
 import { ServerProvider } from './src/contexts/ServerProvider';
+import { BottomSheetProvider } from './src/contexts/BottomSheetProvider';
 
 // Main
-import { StackNavigator } from './src/stack';
+import { ConnectedStackNavigator } from './src/stack';
 
 export const App = () => {
   return (
@@ -30,9 +31,11 @@ export const App = () => {
           <AsyncStorageProvider>
             <AuthProvider>
               <ServerProvider>
-                <NavigationContainer>
-                  <StackNavigator />
-                </NavigationContainer>
+                <ActionSheetProvider>
+                  <BottomSheetProvider>
+                    <ConnectedStackNavigator />
+                  </BottomSheetProvider>
+                </ActionSheetProvider>
               </ServerProvider>
             </AuthProvider>
           </AsyncStorageProvider>

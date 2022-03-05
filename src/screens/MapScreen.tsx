@@ -32,8 +32,8 @@ export const MapScreen = () => {
       ) : null}
       <WebView
         originWhitelist={['*']}
-        scrollEnabled={false}
-        source={{ uri: `http://localhost:3000` }}
+        // scrollEnabled={false}
+        source={{ uri: `https://www.youtube.com/` }}
         onLoadEnd={() => setLoading(false)}
       />
     </View>
