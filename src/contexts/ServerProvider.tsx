@@ -21,7 +21,7 @@ type ServerProps = {
   data?: DataProps;
   isLogin: boolean;
   LoginServer: (code: string) => void;
-  LogoutServer: () => void;
+  LogoutServer: (code: string) => void;
   getServerName: (code: string) => string | undefined;
 };
 
@@ -29,7 +29,7 @@ export const ServerContext = createContext<ServerProps>({
   data: undefined,
   isLogin: false,
   LoginServer: (code: string) => {},
-  LogoutServer: () => {},
+  LogoutServer: (code: string) => {},
   getServerName: (code: string) => '',
 });
 
@@ -48,19 +48,19 @@ export const ServerProvider: FC = ({ children }) => {
   };
 
   const LoginServer = (code: string) => {
-    const usersWrokspaceRef = db
+    const usersWorkspaceRef = db
       .ref(`users/${currentUser?.auth?.uid}`)
       .child('workspace');
 
     let updateData = {};
-    usersWrokspaceRef.on('value', (snapshot) => {
+    usersWorkspaceRef.on('value', (snapshot) => {
       updateData = Object.fromEntries(
         Object.keys({ ...snapshot.val(), [code]: true }).map((key) =>
           key === code ? [key, true] : [key, false]
         )
       );
     });
-    usersWrokspaceRef.update(updateData);
+    usersWorkspaceRef.update(updateData);
 
     db.ref(`workspace/${code}`)
       .child('members')
@@ -68,27 +68,50 @@ export const ServerProvider: FC = ({ children }) => {
         [`${currentUser?.auth?.uid}`]: true,
       });
 
-    db.ref(`workspace/${code}`).on('value', (snapshot) => {
-      setData({ ...snapshot.val(), id: code });
-      storageData({
-        mode: 'set',
-        attributes: { key: '@server', val: 'true' },
+    db.ref(`workspace/${code}`)
+      .get()
+      .then((snapshot) => {
+        setData({ ...snapshot.val(), id: code });
+        setData({ ...snapshot.val(), id: code });
+        storageData({
+          mode: 'set',
+          attributes: { key: '@server', val: 'true' },
+        });
+        storageData({
+          mode: 'set',
+          attributes: { key: '@code', val: code },
+        });
+        setIsLogin(true);
       });
-      storageData({
-        mode: 'set',
-        attributes: { key: '@code', val: code },
-      });
-      setIsLogin(true);
-    });
   };
 
-  const LogoutServer = () => {
-    storageData({
-      mode: 'set',
-      attributes: { key: '@server', val: 'false' },
+  const LogoutServer = (code: string) => {
+    const usersWorkspaceRef = db
+      .ref(`users/${currentUser.auth?.uid}`)
+      .child(`workspace`);
+    usersWorkspaceRef
+      .child(code)
+      .remove()
+      .then(() => {
+        storageData({
+          mode: 'set',
+          attributes: { key: '@server', val: 'false' },
+        });
+        storageData({ mode: 'remove', attributes: { key: '@code' } });
+        db.ref(`workspace/${code}`)
+          .child(`members/${currentUser.auth?.uid}`)
+          .remove();
+      });
+
+    let nextCode = '';
+    usersWorkspaceRef.on('value', (snapshot) => {
+      nextCode = snapshot.val() ? Object.keys(snapshot.val())[0] : '';
     });
-    storageData({ mode: 'remove', attributes: { key: '@code' } });
-    setIsLogin(false);
+    if (nextCode.length) {
+      LoginServer(nextCode);
+    } else {
+      setIsLogin(false);
+    }
   };
 
   useEffect(() => {

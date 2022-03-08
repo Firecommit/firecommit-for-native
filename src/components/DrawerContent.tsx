@@ -42,19 +42,23 @@ export const DrawerContent = (props: DrawerContentComponentProps) => {
                   onPress={() =>
                     showActionSheetWithOptions(
                       {
-                        options: ['コピー', '削除', 'キャンセル'],
+                        options: ['招待コードのコピー', '削除', 'キャンセル'],
                         destructiveButtonIndex: 1,
                         cancelButtonIndex: 2,
                       },
                       (index) => {
                         switch (index) {
-                          case 0:
+                          case 0: {
                             Clipboard.setString(key);
                             break;
-                          case 1:
+                          }
+                          case 1: {
+                            LogoutServer(key);
                             break;
-                          default:
+                          }
+                          default: {
                             break;
+                          }
                         }
                       }
                     )
@@ -122,7 +126,6 @@ export const DrawerContent = (props: DrawerContentComponentProps) => {
                 switch (index) {
                   case 0:
                     signout();
-                    LogoutServer();
                     break;
                   default:
                     break;
