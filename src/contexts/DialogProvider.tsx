@@ -1,4 +1,5 @@
 import React, { createContext, FC, useState } from 'react';
+import { Keyboard } from 'react-native';
 import { DialogContent } from '../components/DialogContent';
 
 type DialogProps = {
@@ -17,7 +18,10 @@ export const DialogContext = createContext<DialogProps>({
 
 export const DialogProvider: FC = ({ children }) => {
   const [visible, setVisible] = useState(false);
-  const showDialog = () => setVisible(true);
+  const showDialog = () => {
+    setVisible(true);
+    Keyboard.dismiss();
+  };
   const hideDialog = () => setVisible(false);
   const [error, setError] = useState('');
   const displayError = (msg: string) => setError(msg);

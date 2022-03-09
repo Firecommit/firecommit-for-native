@@ -12,6 +12,7 @@ import Clipboard from '@react-native-clipboard/clipboard';
 import { AuthContext } from '../contexts/AuthProvider';
 import { ServerContext } from '../contexts/ServerProvider';
 import { BottomSheetContext } from '../contexts/BottomSheetProvider';
+import { AddServerScreen } from '../screens/AddServerScreen';
 
 export const DrawerContent = (props: DrawerContentComponentProps) => {
   const { currentUser, signout } = useContext(AuthContext);
@@ -42,7 +43,11 @@ export const DrawerContent = (props: DrawerContentComponentProps) => {
                   onPress={() =>
                     showActionSheetWithOptions(
                       {
-                        options: ['招待コードのコピー', '削除', 'キャンセル'],
+                        options: [
+                          '招待コードのコピー',
+                          'サーバーからログアウト',
+                          'キャンセル',
+                        ],
                         destructiveButtonIndex: 1,
                         cancelButtonIndex: 2,
                       },
@@ -88,11 +93,7 @@ export const DrawerContent = (props: DrawerContentComponentProps) => {
           }}
           label="マップサーバーを追加する"
           onPress={() => {
-            showBottomSheet(
-              <View style={{ flex: 1, alignItems: 'center' }}>
-                <Text>Foo bar</Text>
-              </View>
-            );
+            showBottomSheet(<AddServerScreen />);
             presentModalHandler();
           }}
         />

@@ -15,11 +15,13 @@ import {
 
 type BottomSheetProps = {
   presentModalHandler: () => void;
+  closeModalHandler: () => void;
   showBottomSheet: (node: ReactNode) => void;
 };
 
 export const BottomSheetContext = createContext<BottomSheetProps>({
   presentModalHandler: () => {},
+  closeModalHandler: () => {},
   showBottomSheet: (node: ReactNode) => {},
 });
 
@@ -27,8 +29,13 @@ export const BottomSheetProvider: FC = ({ children }) => {
   const [content, setContent] = useState<ReactNode>(null);
   const bottomSheetModalRef = useRef<BottomSheetModal>(null);
   const snapPoints = useMemo(() => ['94%'], []);
+
   const presentModalHandler = useCallback(() => {
     bottomSheetModalRef.current?.present();
+  }, []);
+
+  const closeModalHandler = useCallback(() => {
+    bottomSheetModalRef.current?.close();
   }, []);
 
   const Backdrop = () => {
@@ -51,7 +58,7 @@ export const BottomSheetProvider: FC = ({ children }) => {
   );
 
   const memo = useMemo<BottomSheetProps>(
-    () => ({ presentModalHandler, showBottomSheet }),
+    () => ({ presentModalHandler, closeModalHandler, showBottomSheet }),
     []
   );
 

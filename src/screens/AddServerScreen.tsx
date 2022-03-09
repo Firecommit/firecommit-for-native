@@ -1,12 +1,13 @@
 import React, { useContext, useState } from 'react';
-import { View } from 'react-native';
+import { Keyboard, View } from 'react-native';
 import { Caption, Headline, TextInput, Button } from 'react-native-paper';
 import { ServerContext } from '../contexts/ServerProvider';
-import { DrawerProps } from '../types';
+import { BottomSheetContext } from '../contexts/BottomSheetProvider';
 
-export const AddServerScreen = ({ navigation }: DrawerProps) => {
+export const AddServerScreen = () => {
   const [invCode, setInvCode] = useState<string>('');
   const { LoginServer } = useContext(ServerContext);
+  const { closeModalHandler } = useContext(BottomSheetContext);
 
   return (
     <View
@@ -17,14 +18,6 @@ export const AddServerScreen = ({ navigation }: DrawerProps) => {
         marginTop: 64,
       }}
     >
-      <Button
-        style={{ marginRight: 'auto' }}
-        icon="chevron-left"
-        mode="text"
-        onPress={() => navigation.navigate('Tab')}
-      >
-        戻る
-      </Button>
       <Headline style={{ marginBottom: 16 }}>マップサーバーへ参加</Headline>
       <Caption>
         マップサーバーは、あなたやスタッフが働く様子を映す場所です。
@@ -49,7 +42,8 @@ export const AddServerScreen = ({ navigation }: DrawerProps) => {
           mode="contained"
           onPress={() => {
             LoginServer(invCode);
-            navigation.navigate('Tab');
+            closeModalHandler();
+            Keyboard.dismiss();
           }}
           disabled={!invCode || !invCode.match(/\S/g)}
         >
