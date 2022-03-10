@@ -37,7 +37,7 @@ export const ServerContext = createContext<ServerProps>({
 export const ServerProvider: FC = ({ children }) => {
   const [data, setData] = useState<DataProps>();
   const { storage, storageData } = useContext(AsyncStorageContext);
-  const { displayError, showDialog } = useContext(DialogContext);
+  const { displayError } = useContext(DialogContext);
   const [isLogin, setIsLogin] = useState(storage?.['@server'] === 'true');
   const { currentUser } = useContext(AuthContext);
 
@@ -86,8 +86,9 @@ export const ServerProvider: FC = ({ children }) => {
           });
           setIsLogin(true);
         } else {
-          displayError(`コード "${code}" のワークスペースは存在しません`);
-          showDialog();
+          displayError({
+            msg: `コード "${code}" のマップサーバーは存在しません`,
+          });
         }
       });
   };

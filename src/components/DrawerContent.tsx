@@ -38,8 +38,9 @@ export const DrawerContent = (props: DrawerContentComponentProps) => {
               left={() => <List.Icon icon="folder" />}
               right={() => (
                 <IconButton
-                  icon="dots-horizontal"
-                  size={18}
+                  icon="dots-vertical"
+                  size={20}
+                  style={{ marginTop: 12 }}
                   onPress={() =>
                     showActionSheetWithOptions(
                       {

@@ -23,7 +23,7 @@ export const BottomTabNavigator: FC = () => {
       <Tab.Screen
         name="User"
         component={UserScreen}
-        options={{ tabBarIcon: 'shield-account-outline' }}
+        options={{ tabBarIcon: 'account' }}
       />
     </Tab.Navigator>
   );

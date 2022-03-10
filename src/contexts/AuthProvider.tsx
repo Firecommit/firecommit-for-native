@@ -6,6 +6,7 @@ import React, {
   useState,
 } from 'react';
 import firebase, { auth, db } from '../../firebase';
+import { ErrorProps } from '../types';
 import { AsyncStorageContext } from './AsyncStorageProvider';
 import { DialogContext } from './DialogProvider';
 
@@ -46,7 +47,7 @@ export const AuthProvider: FC = ({ children }) => {
     data: undefined,
   });
   const { storageData, storage } = useContext(AsyncStorageContext);
-  const { showDialog, displayError } = useContext(DialogContext);
+  const { displayError } = useContext(DialogContext);
   const [isSignedIn, setIsSignedIn] = useState(
     storage?.['@remember'] === 'true'
   );
@@ -82,6 +83,9 @@ export const AuthProvider: FC = ({ children }) => {
   };
 
   const signup = (name: string, email: string, password: string) => {
+    const error: ErrorProps = {
+      msg: !name.length ? '- 氏名を入力してください' : '',
+    };
     const data = {
       coordinate: {
         x: 0,
@@ -98,24 +102,27 @@ export const AuthProvider: FC = ({ children }) => {
         });
         db.ref(`users/${user?.uid}`)
           .set(data)
-          .catch((error) => {
-            displayError(error.message);
-            showDialog();
+          .catch((res) => {
+            error.msg += `${error ? '\n' : ''}- ${res.message}`;
+            displayError(error);
           });
         storageData({
           mode: 'set',
           attributes: { key: '@remember', val: 'true' },
         });
-        storageData({ mode: 'set', attributes: { key: '@email', val: email } });
+        storageData({
+          mode: 'set',
+          attributes: { key: '@email', val: email },
+        });
         storageData({
           mode: 'set',
           attributes: { key: '@password', val: password },
         });
         setIsSignedIn(true);
       })
-      .catch((error) => {
-        displayError(error.message);
-        showDialog();
+      .catch((res) => {
+        error.msg += `${error ? '\n' : ''}- ${res.message}`;
+        displayError(error);
       });
   };
 
@@ -139,9 +146,8 @@ export const AuthProvider: FC = ({ children }) => {
           setCurrentUser({ auth: user, data: snapshot.val() });
         });
       })
-      .catch((error) => {
-        displayError(error.message);
-        showDialog();
+      .catch((res) => {
+        displayError({ msg: res.message });
       });
   };
 
@@ -157,9 +163,8 @@ export const AuthProvider: FC = ({ children }) => {
         });
         setIsSignedIn(false);
       })
-      .catch((error) => {
-        displayError(error.message);
-        showDialog();
+      .catch((res) => {
+        displayError({ msg: res.message });
       });
   };
 
