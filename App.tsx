@@ -10,7 +10,7 @@
 import React from 'react';
 import 'react-native-gesture-handler';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
-import { Provider as PaperProvider } from 'react-native-paper';
+import { DefaultTheme, Provider as PaperProvider } from 'react-native-paper';
 import { ActionSheetProvider } from '@expo/react-native-action-sheet';
 
 // Custom Provider
@@ -24,9 +24,18 @@ import { BottomSheetProvider } from './src/contexts/BottomSheetProvider';
 import { ConnectedStackNavigator } from './src/stack';
 
 export const App = () => {
+  const theme = {
+    ...DefaultTheme,
+    roundness: 2,
+    colors: {
+      ...DefaultTheme.colors,
+      primary: '#FC8132',
+      accent: '#329CFC',
+    },
+  };
   return (
     <SafeAreaProvider>
-      <PaperProvider>
+      <PaperProvider theme={theme}>
         <DialogProvider>
           <AsyncStorageProvider>
             <AuthProvider>
