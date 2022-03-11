@@ -57,29 +57,46 @@ export const AuthProvider: FC = ({ children }) => {
       `${storage?.['@email']}`,
       `${storage?.['@password']}`
     );
-    auth.currentUser?.reauthenticateWithCredential(credential).then(() => {
-      switch (type) {
-        case 'name':
-          auth.currentUser?.updateProfile({ displayName: val });
-          break;
-        case 'email':
-          auth.currentUser?.updateEmail(val);
-          storageData({
-            mode: 'set',
-            attributes: { key: '@email', val },
-          });
-          break;
-        case 'password':
-          auth.currentUser?.updatePassword(val);
-          storageData({
-            mode: 'set',
-            attributes: { key: '@password', val },
-          });
-          break;
-        default:
-          break;
-      }
-    });
+    auth.currentUser
+      ?.reauthenticateWithCredential(credential)
+      .then(() => {
+        switch (type) {
+          case 'name':
+            if (val.length) {
+              auth.currentUser?.updateProfile({ displayName: val });
+            } else {
+              displayError({ msg: '氏名を入力してください' });
+            }
+            break;
+          case 'email':
+            auth.currentUser
+              ?.updateEmail(val)
+              .then(() => {
+                storageData({
+                  mode: 'set',
+                  attributes: { key: '@email', val },
+                });
+              })
+              .catch((res) => displayError({ msg: res.message }));
+            break;
+          case 'password':
+            auth.currentUser
+              ?.updatePassword(val)
+              .then(() => {
+                storageData({
+                  mode: 'set',
+                  attributes: { key: '@password', val },
+                });
+              })
+              .catch((res) => displayError({ msg: res.message }));
+            break;
+          default:
+            break;
+        }
+      })
+      .catch((res) => {
+        displayError(res.message);
+      });
   };
 
   const signup = (name: string, email: string, password: string) => {
