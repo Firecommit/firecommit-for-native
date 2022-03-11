@@ -3,7 +3,7 @@ import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { connectActionSheet } from '@expo/react-native-action-sheet';
 import { AuthContext } from './contexts/AuthProvider';
-import { DrawerNavigator } from './drawer';
+import { BottomTabNavigator } from './tab';
 
 import { LoginServerScreen } from './screens/LoginServerScreen';
 import { SignInScreen } from './screens/SignInScreen';
@@ -18,12 +18,12 @@ const StackNavigator: FC = () => {
   return (
     <NavigationContainer>
       <Stack.Navigator
-        initialRouteName="Drawer"
+        initialRouteName="Tab"
         screenOptions={{ headerShown: false }}
       >
         {isSignedIn ? (
           isLogin ? (
-            <Stack.Screen name="Drawer" component={DrawerNavigator} />
+            <Stack.Screen name="Tab" component={BottomTabNavigator} />
           ) : (
             <Stack.Screen name="Join" component={LoginServerScreen} />
           )
