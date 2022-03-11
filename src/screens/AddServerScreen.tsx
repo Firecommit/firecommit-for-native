@@ -40,6 +40,7 @@ export const AddServerScreen = () => {
         />
         <Button
           mode="contained"
+          dark
           onPress={() => {
             LoginServer(invCode);
             closeModalHandler();

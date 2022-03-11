@@ -41,6 +41,7 @@ export const LoginServerScreen = ({ navigation }: StackProps) => {
         />
         <Button
           mode="contained"
+          dark
           onPress={() => {
             LoginServer(invCode);
           }}
