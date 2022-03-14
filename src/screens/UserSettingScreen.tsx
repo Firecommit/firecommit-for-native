@@ -1,6 +1,8 @@
+import { useActionSheet } from '@expo/react-native-action-sheet';
+import Clipboard from '@react-native-clipboard/clipboard';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { ParamListBase } from '@react-navigation/routers';
-import React, { useContext } from 'react';
+import React, { useContext, useEffect } from 'react';
 import { View } from 'react-native';
 import { ScrollView } from 'react-native-gesture-handler';
 import { Avatar, Caption, List, Title } from 'react-native-paper';
@@ -13,6 +15,7 @@ export const UserSettingScreen = ({
   navigation: NativeStackNavigationProp<ParamListBase, string>;
 }) => {
   const { currentUser } = useContext(AuthContext);
+  const { showActionSheetWithOptions } = useActionSheet();
 
   return (
     <ScrollView style={{ backgroundColor: '#fff' }}>
@@ -27,11 +30,34 @@ export const UserSettingScreen = ({
         <Avatar.Image
           size={80}
           source={{
-            uri: 'https://pbs.twimg.com/profile_images/952545910990495744/b59hSXUd_400x400.jpg',
+            uri: `${currentUser.auth?.photoURL}`,
           }}
         />
         <Title>{currentUser.auth?.displayName}</Title>
-        <Caption>ID: {currentUser.auth?.uid}</Caption>
+        <Caption
+          onPress={() => {
+            showActionSheetWithOptions(
+              {
+                options: ['ユーザーIDのコピー', 'キャンセル'],
+                destructiveButtonIndex: 1,
+                cancelButtonIndex: 2,
+              },
+              (index) => {
+                switch (index) {
+                  case 0: {
+                    Clipboard.setString(`${currentUser.auth?.uid}`);
+                    break;
+                  }
+                  default: {
+                    break;
+                  }
+                }
+              }
+            );
+          }}
+        >
+          ID: {currentUser.auth?.uid}
+        </Caption>
       </View>
       <List.Section>
         <List.Subheader style={{ backgroundColor: '#eee' }}>

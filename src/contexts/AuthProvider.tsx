@@ -29,7 +29,10 @@ type AuthContextProps = {
   signup: (name: string, email: string, password: string) => void;
   signin: (email: string, password: string) => void;
   signout: () => void;
-  update: (type: 'name' | 'email' | 'password', val: string) => Promise<void>;
+  update: (
+    type: 'picture' | 'name' | 'email' | 'password',
+    val: string
+  ) => Promise<void>;
 };
 
 export const AuthContext = createContext<AuthContextProps>({
@@ -52,26 +55,51 @@ export const AuthProvider: FC = ({ children }) => {
     storage?.['@remember'] === 'true'
   );
 
-  const update = async (type: 'name' | 'email' | 'password', val: string) => {
-    const credential = firebase.auth.EmailAuthProvider.credential(
-      `${storage?.['@email']}`,
-      `${storage?.['@password']}`
-    );
-    auth.currentUser
-      ?.reauthenticateWithCredential(credential)
-      .then(() => {
+  const update = async (
+    type: 'picture' | 'name' | 'email' | 'password',
+    val: string
+  ) => {
+    auth.onAuthStateChanged((user) => {
+      if (user) {
         switch (type) {
+          case 'picture':
+            if (val.length) {
+              user
+                .updateProfile({ photoURL: val })
+                .then(() => {
+                  setCurrentUser((u) => ({
+                    ...u,
+                    auth: auth.currentUser,
+                  }));
+                })
+                .catch((res) => displayError({ msg: res.message }));
+            } else {
+              displayError({ msg: '画像をアップロードしてください' });
+            }
+            break;
           case 'name':
             if (val.length) {
-              auth.currentUser?.updateProfile({ displayName: val });
+              user
+                .updateProfile({ displayName: val })
+                .then(() => {
+                  setCurrentUser((u) => ({
+                    ...u,
+                    auth: auth.currentUser,
+                  }));
+                })
+                .catch((res) => displayError({ msg: res.message }));
             } else {
               displayError({ msg: '氏名を入力してください' });
             }
             break;
           case 'email':
-            auth.currentUser
+            user
               ?.updateEmail(val)
               .then(() => {
+                setCurrentUser((u) => ({
+                  ...u,
+                  auth: auth.currentUser,
+                }));
                 storageData({
                   mode: 'set',
                   attributes: { key: '@email', val },
@@ -80,9 +108,13 @@ export const AuthProvider: FC = ({ children }) => {
               .catch((res) => displayError({ msg: res.message }));
             break;
           case 'password':
-            auth.currentUser
+            user
               ?.updatePassword(val)
               .then(() => {
+                setCurrentUser((u) => ({
+                  ...u,
+                  auth: auth.currentUser,
+                }));
                 storageData({
                   mode: 'set',
                   attributes: { key: '@password', val },
@@ -93,10 +125,8 @@ export const AuthProvider: FC = ({ children }) => {
           default:
             break;
         }
-      })
-      .catch((res) => {
-        displayError(res.message);
-      });
+      }
+    });
   };
 
   const signup = (name: string, email: string, password: string) => {

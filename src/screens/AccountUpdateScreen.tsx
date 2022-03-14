@@ -1,11 +1,12 @@
 import React, { FC, useContext, useState } from 'react';
-import { View } from 'react-native';
-import { Button, Paragraph, TextInput, useTheme } from 'react-native-paper';
+import { Image, View } from 'react-native';
+import { Button, TextInput, useTheme } from 'react-native-paper';
+import { Asset, launchImageLibrary } from 'react-native-image-picker';
 import { AuthContext } from '../contexts/AuthProvider';
 
 export const AccountPictureUpdateScreen: FC = () => {
-  const { currentUser, update } = useContext(AuthContext);
-  const [name, setName] = useState<string>(`${currentUser.auth?.displayName}`);
+  const { update } = useContext(AuthContext);
+  const [image, setImage] = useState<Asset>();
   const [loading, setLoading] = useState(false);
   const theme = useTheme();
 
@@ -17,16 +18,51 @@ export const AccountPictureUpdateScreen: FC = () => {
         padding: 32,
       }}
     >
-      <Paragraph>ファイルアップロード</Paragraph>
+      {image ? (
+        <View
+          style={{
+            display: 'flex',
+            justifyContent: 'center',
+            alignItems: 'center',
+            marginBottom: 64,
+          }}
+        >
+          <Image
+            source={{ uri: image.uri }}
+            style={{
+              width: 128,
+              height: 128,
+              borderRadius: 1000,
+            }}
+          />
+        </View>
+      ) : null}
+      <Button
+        style={{ marginBottom: 32 }}
+        mode="contained"
+        color={theme.colors.primary}
+        dark
+        onPress={() => {
+          launchImageLibrary({
+            mediaType: 'photo',
+            maxWidth: 256,
+            maxHeight: 256,
+          }).then((value) => {
+            setImage(value.assets?.[0]);
+          });
+        }}
+      >
+        アップロード
+      </Button>
       <Button
         mode="contained"
         color={theme.colors.accent}
         loading={loading}
         dark
-        disabled={!name.length}
+        disabled={!image}
         onPress={() => {
           setLoading(true);
-          update('name', name).then(() => {
+          update('picture', `${image?.uri}`).then(() => {
             setTimeout(() => setLoading(false), 1000);
           });
         }}
