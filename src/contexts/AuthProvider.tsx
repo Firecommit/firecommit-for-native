@@ -6,6 +6,7 @@ import React, {
   useState,
 } from 'react';
 import firebase, { auth, db } from '../../firebase';
+import { ErrorProps } from '../types';
 import { AsyncStorageContext } from './AsyncStorageProvider';
 import { DialogContext } from './DialogProvider';
 
@@ -28,7 +29,10 @@ type AuthContextProps = {
   signup: (name: string, email: string, password: string) => void;
   signin: (email: string, password: string) => void;
   signout: () => void;
-  update: (type: 'name' | 'email' | 'password', val: string) => Promise<void>;
+  update: (
+    type: 'picture' | 'name' | 'email' | 'password',
+    val: string
+  ) => Promise<void>;
 };
 
 export const AuthContext = createContext<AuthContextProps>({
@@ -46,42 +50,89 @@ export const AuthProvider: FC = ({ children }) => {
     data: undefined,
   });
   const { storageData, storage } = useContext(AsyncStorageContext);
-  const { showDialog, displayError } = useContext(DialogContext);
+  const { displayError } = useContext(DialogContext);
   const [isSignedIn, setIsSignedIn] = useState(
     storage?.['@remember'] === 'true'
   );
 
-  const update = async (type: 'name' | 'email' | 'password', val: string) => {
-    const credential = firebase.auth.EmailAuthProvider.credential(
-      `${storage?.['@email']}`,
-      `${storage?.['@password']}`
-    );
-    auth.currentUser?.reauthenticateWithCredential(credential).then(() => {
-      switch (type) {
-        case 'name':
-          auth.currentUser?.updateProfile({ displayName: val });
-          break;
-        case 'email':
-          auth.currentUser?.updateEmail(val);
-          storageData({
-            mode: 'set',
-            attributes: { key: '@email', val },
-          });
-          break;
-        case 'password':
-          auth.currentUser?.updatePassword(val);
-          storageData({
-            mode: 'set',
-            attributes: { key: '@password', val },
-          });
-          break;
-        default:
-          break;
+  const update = async (
+    type: 'picture' | 'name' | 'email' | 'password',
+    val: string
+  ) => {
+    auth.onAuthStateChanged((user) => {
+      if (user) {
+        switch (type) {
+          case 'picture':
+            if (val.length) {
+              user
+                .updateProfile({ photoURL: val })
+                .then(() => {
+                  setCurrentUser((u) => ({
+                    ...u,
+                    auth: auth.currentUser,
+                  }));
+                })
+                .catch((res) => displayError({ msg: res.message }));
+            } else {
+              displayError({ msg: '画像をアップロードしてください' });
+            }
+            break;
+          case 'name':
+            if (val.length) {
+              user
+                .updateProfile({ displayName: val })
+                .then(() => {
+                  setCurrentUser((u) => ({
+                    ...u,
+                    auth: auth.currentUser,
+                  }));
+                })
+                .catch((res) => displayError({ msg: res.message }));
+            } else {
+              displayError({ msg: '氏名を入力してください' });
+            }
+            break;
+          case 'email':
+            user
+              ?.updateEmail(val)
+              .then(() => {
+                setCurrentUser((u) => ({
+                  ...u,
+                  auth: auth.currentUser,
+                }));
+                storageData({
+                  mode: 'set',
+                  attributes: { key: '@email', val },
+                });
+              })
+              .catch((res) => displayError({ msg: res.message }));
+            break;
+          case 'password':
+            user
+              ?.updatePassword(val)
+              .then(() => {
+                setCurrentUser((u) => ({
+                  ...u,
+                  auth: auth.currentUser,
+                }));
+                storageData({
+                  mode: 'set',
+                  attributes: { key: '@password', val },
+                });
+              })
+              .catch((res) => displayError({ msg: res.message }));
+            break;
+          default:
+            break;
+        }
       }
     });
   };
 
   const signup = (name: string, email: string, password: string) => {
+    const error: ErrorProps = {
+      msg: !name.length ? '- 氏名を入力してください' : '',
+    };
     const data = {
       coordinate: {
         x: 0,
@@ -98,24 +149,27 @@ export const AuthProvider: FC = ({ children }) => {
         });
         db.ref(`users/${user?.uid}`)
           .set(data)
-          .catch((error) => {
-            displayError(error.message);
-            showDialog();
+          .catch((res) => {
+            error.msg += `${error ? '\n' : ''}- ${res.message}`;
+            displayError(error);
           });
         storageData({
           mode: 'set',
           attributes: { key: '@remember', val: 'true' },
         });
-        storageData({ mode: 'set', attributes: { key: '@email', val: email } });
+        storageData({
+          mode: 'set',
+          attributes: { key: '@email', val: email },
+        });
         storageData({
           mode: 'set',
           attributes: { key: '@password', val: password },
         });
         setIsSignedIn(true);
       })
-      .catch((error) => {
-        displayError(error.message);
-        showDialog();
+      .catch((res) => {
+        error.msg += `${error ? '\n' : ''}- ${res.message}`;
+        displayError(error);
       });
   };
 
@@ -139,9 +193,8 @@ export const AuthProvider: FC = ({ children }) => {
           setCurrentUser({ auth: user, data: snapshot.val() });
         });
       })
-      .catch((error) => {
-        displayError(error.message);
-        showDialog();
+      .catch((res) => {
+        displayError({ msg: res.message });
       });
   };
 
@@ -157,9 +210,8 @@ export const AuthProvider: FC = ({ children }) => {
         });
         setIsSignedIn(false);
       })
-      .catch((error) => {
-        displayError(error.message);
-        showDialog();
+      .catch((res) => {
+        displayError({ msg: res.message });
       });
   };
 

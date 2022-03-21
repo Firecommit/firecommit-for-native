@@ -7,12 +7,20 @@ import {
   DrawerItem,
 } from '@react-navigation/drawer';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
+import { useActionSheet } from '@expo/react-native-action-sheet';
+import Clipboard from '@react-native-clipboard/clipboard';
 import { AuthContext } from '../contexts/AuthProvider';
 import { ServerContext } from '../contexts/ServerProvider';
+import { BottomSheetContext } from '../contexts/BottomSheetProvider';
+import { AddServerScreen } from '../screens/AddServerScreen';
 
 export const DrawerContent = (props: DrawerContentComponentProps) => {
   const { currentUser, signout } = useContext(AuthContext);
-  const { data, LoginServer, getServerName } = useContext(ServerContext);
+  const { presentModalHandler, showBottomSheet } =
+    useContext(BottomSheetContext);
+  const { data, LoginServer, LogoutServer, getServerName } =
+    useContext(ServerContext);
+  const { showActionSheetWithOptions } = useActionSheet();
 
   return (
     <View style={{ flex: 1, paddingTop: 52 }}>
@@ -29,7 +37,39 @@ export const DrawerContent = (props: DrawerContentComponentProps) => {
               description={key}
               left={() => <List.Icon icon="folder" />}
               right={() => (
-                <IconButton icon="dots-vertical" size={18} onPress={() => {}} />
+                <IconButton
+                  icon="dots-vertical"
+                  size={20}
+                  style={{ marginTop: 12 }}
+                  onPress={() =>
+                    showActionSheetWithOptions(
+                      {
+                        options: [
+                          '招待コードのコピー',
+                          'サーバーからログアウト',
+                          'キャンセル',
+                        ],
+                        destructiveButtonIndex: 1,
+                        cancelButtonIndex: 2,
+                      },
+                      (index) => {
+                        switch (index) {
+                          case 0: {
+                            Clipboard.setString(key);
+                            break;
+                          }
+                          case 1: {
+                            LogoutServer(key);
+                            break;
+                          }
+                          default: {
+                            break;
+                          }
+                        }
+                      }
+                    )
+                  }
+                />
               )}
               onPress={() => {
                 LoginServer(key);
@@ -54,7 +94,8 @@ export const DrawerContent = (props: DrawerContentComponentProps) => {
           }}
           label="マップサーバーを追加する"
           onPress={() => {
-            props.navigation.navigate('Add');
+            showBottomSheet(<AddServerScreen />);
+            presentModalHandler();
           }}
         />
         <DrawerItem
@@ -62,16 +103,38 @@ export const DrawerContent = (props: DrawerContentComponentProps) => {
             return <Icon name="cog-outline" color={color} size={size} />;
           }}
           label="環境設定"
-          onPress={() => {}}
+          onPress={() => {
+            showBottomSheet(
+              <View style={{ flex: 1, alignItems: 'center' }}>
+                <Text>Hello world</Text>
+              </View>
+            );
+            presentModalHandler();
+          }}
         />
         <DrawerItem
           icon={({ color, size }) => {
             return <Icon name="exit-to-app" color={color} size={size} />;
           }}
           label="サインアウト"
-          onPress={() => {
-            signout();
-          }}
+          onPress={() =>
+            showActionSheetWithOptions(
+              {
+                options: ['サインアウト', 'キャンセル'],
+                destructiveButtonIndex: 0,
+                cancelButtonIndex: 1,
+              },
+              (index) => {
+                switch (index) {
+                  case 0:
+                    signout();
+                    break;
+                  default:
+                    break;
+                }
+              }
+            )
+          }
         />
       </Drawer.Section>
     </View>
