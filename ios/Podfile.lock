@@ -1,6 +1,9 @@
 PODS:
   - boost (1.76.0)
   - CocoaAsyncSocket (7.6.5)
+  - CocoaLumberjack (3.7.2):
+    - CocoaLumberjack/Core (= 3.7.2)
+  - CocoaLumberjack/Core (3.7.2)
   - DoubleConversion (1.1.6)
   - EXConstants (11.0.2):
     - ExpoModulesCore
@@ -367,6 +370,9 @@ PODS:
     - React-perflogger (= 0.66.2)
   - RNBackgroundFetch (4.0.4):
     - React-Core
+  - RNBackgroundGeolocation (4.4.4):
+    - CocoaLumberjack (~> 3.7.2)
+    - React-Core
   - RNCAsyncStorage (1.15.14):
     - React-Core
   - RNCClipboard (1.8.5):
@@ -481,6 +487,7 @@ DEPENDENCIES:
   - React-runtimeexecutor (from `../node_modules/react-native/ReactCommon/runtimeexecutor`)
   - ReactCommon/turbomodule/core (from `../node_modules/react-native/ReactCommon`)
   - RNBackgroundFetch (from `../node_modules/react-native-background-fetch`)
+  - RNBackgroundGeolocation (from `../node_modules/react-native-background-geolocation`)
   - "RNCAsyncStorage (from `../node_modules/@react-native-async-storage/async-storage`)"
   - "RNCClipboard (from `../node_modules/@react-native-clipboard/clipboard`)"
   - RNGestureHandler (from `../node_modules/react-native-gesture-handler`)
@@ -496,6 +503,7 @@ DEPENDENCIES:
 SPEC REPOS:
   trunk:
     - CocoaAsyncSocket
+    - CocoaLumberjack
     - Flipper
     - Flipper-Boost-iOSX
     - Flipper-DoubleConversion
@@ -587,6 +595,8 @@ EXTERNAL SOURCES:
     :path: "../node_modules/react-native/ReactCommon"
   RNBackgroundFetch:
     :path: "../node_modules/react-native-background-fetch"
+  RNBackgroundGeolocation:
+    :path: "../node_modules/react-native-background-geolocation"
   RNCAsyncStorage:
     :path: "../node_modules/@react-native-async-storage/async-storage"
   RNCClipboard:
@@ -613,6 +623,7 @@ EXTERNAL SOURCES:
 SPEC CHECKSUMS:
   boost: a7c83b31436843459a1961bfd74b96033dc77234
   CocoaAsyncSocket: 065fd1e645c7abab64f7a6a2007a48038fdc6a99
+  CocoaLumberjack: b7e05132ff94f6ae4dfa9d5bce9141893a21d9da
   DoubleConversion: 831926d9b8bf8166fd87886c4abab286c2422662
   EXConstants: 4cb52b6d8f636c767104a44bf7db3873e9c01a6f
   EXFileSystem: 0a04aba8da751b9ac954065911bcf166503f8267
@@ -662,6 +673,7 @@ SPEC CHECKSUMS:
   React-runtimeexecutor: 393e26602c1b248683372051e34db63e359e3b01
   ReactCommon: c0263c1a41509aeb94be3214fa7bc3b71eae5ef6
   RNBackgroundFetch: 4ba650701219cf06fdc08336cc0b010242d2d024
+  RNBackgroundGeolocation: 21546caac9386ea1de3678a0eac9c58d1302cb32
   RNCAsyncStorage: ea6b5c280997b2b32a587793163b1f10e580c4f7
   RNCClipboard: cc054ad1e8a33d2a74cd13e565588b4ca928d8fd
   RNGestureHandler: a479ebd5ed4221a810967000735517df0d2db211
