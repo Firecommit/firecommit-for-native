@@ -14,3 +14,8 @@ type RootDrawerParamList = {
 };
 
 export type DrawerProps = DrawerScreenProps<RootDrawerParamList>;
+
+export type ErrorProps = {
+  msg: string;
+  code?: string;
+};

@@ -39,7 +39,7 @@ export const SignInScreen = () => {
           style={{ marginBottom: 16 }}
           secureTextEntry
         />
-        <Button mode="contained" onPress={() => signin(email, password)}>
+        <Button mode="contained" dark onPress={() => signin(email, password)}>
           サインイン
         </Button>
       </View>

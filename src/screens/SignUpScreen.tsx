@@ -47,7 +47,11 @@ export const SignUpScreen = () => {
           style={{ marginBottom: 16 }}
           secureTextEntry
         />
-        <Button mode="contained" onPress={() => signup(name, email, password)}>
+        <Button
+          mode="contained"
+          dark
+          onPress={() => signup(name, email, password)}
+        >
           アカウント作成
         </Button>
       </View>
