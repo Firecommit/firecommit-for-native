@@ -1,10 +1,12 @@
-import React, { useState } from 'react';
+import React, { useContext, useState } from 'react';
 import { Dimensions, View } from 'react-native';
 import { ActivityIndicator, Text, useTheme } from 'react-native-paper';
 import { WebView } from 'react-native-webview';
 import { useAttitude } from '../hooks/useAttitude';
 import { useHeading } from '../hooks/useHeading';
 import { useSensorListener } from '../hooks/useSensorListener';
+import { AuthContext } from '../contexts/AuthProvider';
+import { useInjectedJS } from '../hooks/useInjectedJS';
 
 export const MapScreen = () => {
   const theme = useTheme();
@@ -24,6 +26,8 @@ export const MapScreen = () => {
   const deg = (ang: number): number => {
     return ang ? Number(((ang * 180) / Math.PI).toFixed(4)) : 0;
   };
+  const { currentUser } = useContext(AuthContext);
+  const code = useInjectedJS('userId', currentUser.auth?.uid);
 
   return (
     <View
@@ -57,6 +61,9 @@ export const MapScreen = () => {
         originWhitelist={['*']}
         scrollEnabled={false}
         source={{ uri: `http://localhost:3000` }}
+        javaScriptEnabled
+        injectedJavaScript={code}
+        onMessage={(event) => {}}
         onLoadEnd={() => setLoading(false)}
       />
     </View>

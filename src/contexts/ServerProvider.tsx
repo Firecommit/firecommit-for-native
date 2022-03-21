@@ -8,6 +8,7 @@ import React, {
 import { AsyncStorageContext } from './AsyncStorageProvider';
 import { db } from '../../firebase';
 import { AuthContext } from './AuthProvider';
+import { DialogContext } from './DialogProvider';
 
 type DataProps = {
   id: string;
@@ -21,7 +22,7 @@ type ServerProps = {
   data?: DataProps;
   isLogin: boolean;
   LoginServer: (code: string) => void;
-  LogoutServer: () => void;
+  LogoutServer: (code: string) => void;
   getServerName: (code: string) => string | undefined;
 };
 
@@ -29,13 +30,14 @@ export const ServerContext = createContext<ServerProps>({
   data: undefined,
   isLogin: false,
   LoginServer: (code: string) => {},
-  LogoutServer: () => {},
+  LogoutServer: (code: string) => {},
   getServerName: (code: string) => '',
 });
 
 export const ServerProvider: FC = ({ children }) => {
   const [data, setData] = useState<DataProps>();
   const { storage, storageData } = useContext(AsyncStorageContext);
+  const { displayError } = useContext(DialogContext);
   const [isLogin, setIsLogin] = useState(storage?.['@server'] === 'true');
   const { currentUser } = useContext(AuthContext);
 
@@ -48,47 +50,76 @@ export const ServerProvider: FC = ({ children }) => {
   };
 
   const LoginServer = (code: string) => {
-    const usersWrokspaceRef = db
-      .ref(`users/${currentUser?.auth?.uid}`)
-      .child('workspace');
-
-    let updateData = {};
-    usersWrokspaceRef.on('value', (snapshot) => {
-      updateData = Object.fromEntries(
-        Object.keys({ ...snapshot.val(), [code]: true }).map((key) =>
-          key === code ? [key, true] : [key, false]
-        )
-      );
-    });
-    usersWrokspaceRef.update(updateData);
-
     db.ref(`workspace/${code}`)
-      .child('members')
-      .update({
-        [`${currentUser?.auth?.uid}`]: true,
-      });
+      .get()
+      .then((snapshot) => {
+        if (snapshot.val()) {
+          db.ref(`workspace/${code}`)
+            .child('members')
+            .update({
+              [`${currentUser?.auth?.uid}`]: true,
+            });
 
-    db.ref(`workspace/${code}`).on('value', (snapshot) => {
-      setData({ ...snapshot.val(), id: code });
-      storageData({
-        mode: 'set',
-        attributes: { key: '@server', val: 'true' },
+          const usersWorkspaceRef = db
+            .ref(`users/${currentUser?.auth?.uid}`)
+            .child('workspace');
+
+          let updateData = {};
+          usersWorkspaceRef.on('value', (userSnapshot) => {
+            updateData = Object.fromEntries(
+              Object.keys({ ...userSnapshot.val(), [code]: true }).map((key) =>
+                key === code ? [key, true] : [key, false]
+              )
+            );
+          });
+          usersWorkspaceRef.update(updateData);
+
+          setData({ ...snapshot.val(), id: code });
+          setData({ ...snapshot.val(), id: code });
+          storageData({
+            mode: 'set',
+            attributes: { key: '@server', val: 'true' },
+          });
+          storageData({
+            mode: 'set',
+            attributes: { key: '@code', val: code },
+          });
+          setIsLogin(true);
+        } else {
+          displayError({
+            msg: `コード "${code}" のマップサーバーは存在しません`,
+          });
+        }
       });
-      storageData({
-        mode: 'set',
-        attributes: { key: '@code', val: code },
-      });
-      setIsLogin(true);
-    });
   };
 
-  const LogoutServer = () => {
-    storageData({
-      mode: 'set',
-      attributes: { key: '@server', val: 'false' },
+  const LogoutServer = (code: string) => {
+    const usersWorkspaceRef = db
+      .ref(`users/${currentUser.auth?.uid}`)
+      .child(`workspace`);
+    usersWorkspaceRef
+      .child(code)
+      .remove()
+      .then(() => {
+        storageData({
+          mode: 'set',
+          attributes: { key: '@server', val: 'false' },
+        });
+        storageData({ mode: 'remove', attributes: { key: '@code' } });
+        db.ref(`workspace/${code}`)
+          .child(`members/${currentUser.auth?.uid}`)
+          .remove();
+      });
+
+    let nextCode = '';
+    usersWorkspaceRef.on('value', (snapshot) => {
+      nextCode = snapshot.val() ? Object.keys(snapshot.val())[0] : '';
     });
-    storageData({ mode: 'remove', attributes: { key: '@code' } });
-    setIsLogin(false);
+    if (nextCode.length) {
+      LoginServer(nextCode);
+    } else {
+      setIsLogin(false);
+    }
   };
 
   useEffect(() => {

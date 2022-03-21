@@ -2,8 +2,8 @@ import React, { FC } from 'react';
 import { createMaterialBottomTabNavigator } from '@react-navigation/material-bottom-tabs';
 import { useTheme } from 'react-native-paper';
 
-import { MapScreen } from './screens/MapScreen';
-import { UserScreen } from './screens/UserScreen';
+import { UserStackNavigator } from './userstack';
+import { DrawerNavigator } from './drawer';
 
 export const BottomTabNavigator: FC = () => {
   const Tab = createMaterialBottomTabNavigator();
@@ -17,13 +17,13 @@ export const BottomTabNavigator: FC = () => {
     >
       <Tab.Screen
         name="Map"
-        component={MapScreen}
+        component={DrawerNavigator}
         options={{ tabBarIcon: 'google-maps' }}
       />
       <Tab.Screen
         name="User"
-        component={UserScreen}
-        options={{ tabBarIcon: 'shield-account-outline' }}
+        component={UserStackNavigator}
+        options={{ tabBarIcon: 'account' }}
       />
     </Tab.Navigator>
   );

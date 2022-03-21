@@ -1,11 +1,13 @@
 import React, { useContext, useState } from 'react';
 import { View } from 'react-native';
 import { Caption, Headline, TextInput, Button } from 'react-native-paper';
+import { AuthContext } from '../contexts/AuthProvider';
 import { ServerContext } from '../contexts/ServerProvider';
 import { StackProps } from '../types';
 
 export const LoginServerScreen = ({ navigation }: StackProps) => {
   const [invCode, setInvCode] = useState<string>('');
+  const { signout } = useContext(AuthContext);
   const { LoginServer } = useContext(ServerContext);
 
   return (
@@ -39,12 +41,22 @@ export const LoginServerScreen = ({ navigation }: StackProps) => {
         />
         <Button
           mode="contained"
+          dark
           onPress={() => {
             LoginServer(invCode);
           }}
           disabled={!invCode || !invCode.match(/\S/g)}
         >
           サーバーに参加する
+        </Button>
+        <Button
+          style={{ marginTop: 16 }}
+          mode="outlined"
+          onPress={() => {
+            signout();
+          }}
+        >
+          サインアウト
         </Button>
       </View>
     </View>

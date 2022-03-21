@@ -43,3 +43,8 @@ export type StepData = {
   count: number;
   length: number;
 };
+
+export type ErrorProps = {
+  msg: string;
+  code?: string;
+};

@@ -29,6 +29,27 @@ export const SignInScreen = () => {
         >
           サインイン
         </Headline>
+      <View style={{ width: '100%', paddingHorizontal: 16, marginBottom: 16 }}>
+        <TextInput
+          label="メールアドレス"
+          mode="outlined"
+          value={email}
+          autoCapitalize="none"
+          onChangeText={(text) => setEmail(text)}
+          style={{ marginBottom: 16 }}
+        />
+        <TextInput
+          label="パスワード"
+          mode="outlined"
+          autoCapitalize="none"
+          value={password}
+          onChangeText={(text) => setPassword(text)}
+          style={{ marginBottom: 16 }}
+          secureTextEntry
+        />
+        <Button mode="contained" dark onPress={() => signin(email, password)}>
+          サインイン
+        </Headline>
         <View
           style={{ width: '100%', paddingHorizontal: 16, marginBottom: 16 }}
         >
