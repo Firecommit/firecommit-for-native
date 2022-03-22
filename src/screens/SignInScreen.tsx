@@ -8,7 +8,6 @@ import {
   useTheme,
 } from 'react-native-paper';
 import { Link } from '@react-navigation/native';
-import { TouchableWithoutFeedback } from 'react-native-gesture-handler';
 import { AuthContext } from '../contexts/AuthProvider';
 
 export const SignInScreen = () => {
@@ -27,27 +26,6 @@ export const SignInScreen = () => {
             textAlign: 'center',
           }}
         >
-          サインイン
-        </Headline>
-      <View style={{ width: '100%', paddingHorizontal: 16, marginBottom: 16 }}>
-        <TextInput
-          label="メールアドレス"
-          mode="outlined"
-          value={email}
-          autoCapitalize="none"
-          onChangeText={(text) => setEmail(text)}
-          style={{ marginBottom: 16 }}
-        />
-        <TextInput
-          label="パスワード"
-          mode="outlined"
-          autoCapitalize="none"
-          value={password}
-          onChangeText={(text) => setPassword(text)}
-          style={{ marginBottom: 16 }}
-          secureTextEntry
-        />
-        <Button mode="contained" dark onPress={() => signin(email, password)}>
           サインイン
         </Headline>
         <View
@@ -74,6 +52,7 @@ export const SignInScreen = () => {
           />
           <Button
             mode="contained"
+            dark
             onPress={() => {
               signin(email, password);
               Keyboard.dismiss();

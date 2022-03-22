@@ -21,38 +21,6 @@ export const SignUpScreen = () => {
     <KeyboardAvoidingView style={{ flex: 1 }} behavior="padding">
       <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
         <Headline style={{ marginBottom: 16, fontWeight: 'bold' }}>
-        アカウント作成
-      </Headline>
-      <View style={{ width: '100%', paddingHorizontal: 16, marginBottom: 16 }}>
-        <TextInput
-          label="氏名"
-          mode="outlined"
-          value={name}
-          onChangeText={(text) => setName(text)}
-          style={{ marginBottom: 16 }}
-        />
-        <TextInput
-          label="メールアドレス"
-          mode="outlined"
-          autoCapitalize="none"
-          value={email}
-          onChangeText={(text) => setEmail(text)}
-          style={{ marginBottom: 16 }}
-        />
-        <TextInput
-          label="パスワード"
-          mode="outlined"
-          autoCapitalize="none"
-          value={password}
-          onChangeText={(text) => setPassword(text)}
-          style={{ marginBottom: 16 }}
-          secureTextEntry
-        />
-        <Button
-          mode="contained"
-          dark
-          onPress={() => signup(name, email, password)}
-        >
           アカウント作成
         </Headline>
         <View
@@ -87,6 +55,7 @@ export const SignUpScreen = () => {
           />
           <Button
             mode="contained"
+            dark
             onPress={() => {
               signup(name, email, password);
               Keyboard.dismiss();
