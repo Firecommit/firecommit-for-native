@@ -11,7 +11,7 @@ export const DrawerNavigator = () => {
   return (
     <Drawer.Navigator drawerContent={(props) => <DrawerContent {...props} />}>
       <Drawer.Screen
-        name="Map"
+        name="Home"
         component={MapScreen}
         options={{
           drawerType: 'slide',

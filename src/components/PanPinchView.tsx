@@ -1,17 +1,15 @@
 import React, { FC } from 'react';
-import { Image, StyleSheet, useWindowDimensions, View } from 'react-native';
+import { StyleSheet, useWindowDimensions, View } from 'react-native';
 import {
   PanGestureHandler,
   PanGestureHandlerGestureEvent,
   PinchGestureHandler,
   PinchGestureHandlerGestureEvent,
 } from 'react-native-gesture-handler';
-import { useTheme } from 'react-native-paper';
 import Animated, {
   useAnimatedGestureHandler,
   useAnimatedStyle,
   useSharedValue,
-  withSpring,
 } from 'react-native-reanimated';
 
 type PanContextType = {
@@ -19,21 +17,14 @@ type PanContextType = {
   translateY: number;
 };
 
-const SampleImageRef = Image.resolveAssetSource(
-  require('../../assets/sample.jpg')
-);
-
-export const IndoorMapView: FC = ({ children }) => {
-  const theme = useTheme();
+export const PanPinchView: FC = ({ children }) => {
   const window = useWindowDimensions();
-
   const translateX = useSharedValue(0);
   const translateY = useSharedValue(0);
   const scale = useSharedValue(1);
   const savedScale = useSharedValue(1);
   const focalX = useSharedValue(0);
   const focalY = useSharedValue(0);
-  const rotate = useSharedValue(0);
 
   const panGestureEvent = useAnimatedGestureHandler<
     PanGestureHandlerGestureEvent,
@@ -94,6 +85,7 @@ export const IndoorMapView: FC = ({ children }) => {
             {
               width: window.width,
               height: window.height,
+              position: 'relative',
             },
             PinchHandlerStyle,
           ]}
@@ -101,21 +93,17 @@ export const IndoorMapView: FC = ({ children }) => {
           <PanGestureHandler onGestureEvent={panGestureEvent}>
             <Animated.View
               style={[
+                StyleSheet.absoluteFillObject,
                 {
-                  ...StyleSheet.absoluteFillObject,
-                  left: -SampleImageRef.width / 2,
-                  top: -window.height / 2,
-                  width: SampleImageRef.width,
-                  height: SampleImageRef.height,
+                  width: 4096,
+                  height: 4096,
+                  left: -4096 / 2,
+                  top: 100 + 320 - 4096 / 2,
                 },
                 PanHandlerStyle,
               ]}
             >
-              <Image
-                resizeMode="center"
-                style={{ flex: 1 }}
-                source={{ uri: SampleImageRef.uri }}
-              />
+              {children}
             </Animated.View>
           </PanGestureHandler>
         </Animated.View>

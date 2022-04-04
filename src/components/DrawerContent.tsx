@@ -73,7 +73,7 @@ export const DrawerContent = (props: DrawerContentComponentProps) => {
               )}
               onPress={() => {
                 LoginServer(key);
-                props.navigation.navigate('Tab');
+                props.navigation.navigate('Home');
               }}
             />
           ))}
