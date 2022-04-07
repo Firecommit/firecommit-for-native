@@ -161,8 +161,8 @@ export const PanPinchView = ({
                 {
                   width: 4096,
                   height: 4096,
-                  left: -4096 / 2,
-                  top: 100 + 320 - 4096 / 2,
+                  left: window.width / 2 - 4096 / 2,
+                  top: window.height / 2 - 4096 / 2,
                 },
                 PanHandlerStyle,
               ]}
