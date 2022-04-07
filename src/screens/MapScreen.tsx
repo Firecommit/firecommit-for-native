@@ -8,9 +8,10 @@ import { useHeading } from '../hooks/useHeading';
 import { useSensorListener } from '../hooks/useSensorListener';
 import { useStep } from '../hooks/useStep';
 import { BadgeButton } from '../components/BadgeButton';
-import { auth, storage } from '../../firebase';
+import { auth, db, storage } from '../../firebase';
 import { ServerContext } from '../contexts/ServerProvider';
 import { DialogContext } from '../contexts/DialogProvider';
+import { AuthContext } from '../contexts/AuthProvider';
 
 type RNImageRefType = {
   uri: string;
@@ -18,15 +19,27 @@ type RNImageRefType = {
   height: number;
 };
 
+type MembersType = Array<{
+  uid: string;
+  name: string;
+  email: string;
+  location: {
+    x: number;
+    y: number;
+  };
+}>;
+
 export const MapScreen = () => {
   const [position, setPosition] = useState({ x: 0, y: 0 });
   const [isPos, setIsPos] = useState(false);
   const [isCurrentPos, setIsCurrentPos] = useState(false);
   const [toggle, setToggle] = useState<string | null>('layer1');
   const layers = useRef<Array<string>>([]);
+  const members = useRef<MembersType>([]);
   const RNImageRef = useRef<RNImageRefType>({ uri: '', width: 0, height: 0 });
   const { data } = useContext(ServerContext);
   const { displayError } = useContext(DialogContext);
+  const { currentUser } = useContext(AuthContext);
 
   const theme = useTheme();
   const [attitude, setAttitudeSensors] = useAttitude();
@@ -51,33 +64,51 @@ export const MapScreen = () => {
   }, [toggle]);
 
   useEffect(() => {
-    auth.onAuthStateChanged((user) => {
-      if (user && data) {
-        setToggle('layer1');
-        storage
-          .ref()
-          .child(`maps/${data.id}/layer1.png`)
-          .getDownloadURL()
-          .then((url) => {
-            RNImage.getSize(url, (width, height) => {
-              RNImageRef.current = { uri: url, width, height };
-            });
-          })
-          .catch((res) => displayError({ msg: res.message }));
-        storage
-          .ref()
-          .child(`maps/${data.id}`)
-          .listAll()
-          .then((res) => {
-            layers.current = [];
-            res.items.forEach((itemRef) => {
-              layers.current.push(itemRef.name.replace('.png', ''));
-            });
-          })
-          .catch((res) => displayError({ msg: res.message }));
-      }
-    });
-  }, [data]);
+    if (data && currentUser.auth) {
+      auth.onAuthStateChanged((user) => {
+        if (user) {
+          setToggle('layer1');
+          storage
+            .ref()
+            .child(`maps/${data.id}/layer1.png`)
+            .getDownloadURL()
+            .then((url) => {
+              RNImage.getSize(url, (width, height) => {
+                RNImageRef.current = { uri: url, width, height };
+              });
+            })
+            .catch((res) => displayError({ msg: res.message }));
+          storage
+            .ref()
+            .child(`maps/${data.id}`)
+            .listAll()
+            .then((res) => {
+              layers.current = [];
+              res.items.forEach((itemRef) => {
+                layers.current.push(itemRef.name.replace('.png', ''));
+              });
+            })
+            .catch((res) => displayError({ msg: res.message }));
+        }
+      });
+      db.ref(`workspace/${data.id}`)
+        .child('members')
+        .on('value', (snapshot) => {
+          members.current = [];
+          Object.keys(snapshot.val()).forEach((uid) => {
+            if (uid !== 'undefined' && currentUser.auth?.uid !== uid) {
+              db.ref(`users/${uid}`)
+                .child('coordinate')
+                .on('value', (coordinate) => {
+                  const { x, y } = coordinate.val();
+                  const location = { x, y };
+                  members.current.push({ uid, name: '', email: '', location });
+                });
+            }
+          });
+        });
+    }
+  }, [data, currentUser]);
 
   const panX = -(position.x - RNImageRef.current.width / 6);
   const panY = -(position.y - RNImageRef.current.height / 6);
@@ -155,10 +186,13 @@ export const MapScreen = () => {
             position={position}
             heading={heading.origin}
           />
-          <UserPin color={theme.colors.accent} position={{ x: 100, y: 100 }} />
-          <UserPin color={theme.colors.accent} position={{ x: 120, y: 50 }} />
-          <UserPin color={theme.colors.accent} position={{ x: 300, y: 100 }} />
-          <UserPin color={theme.colors.accent} position={{ x: 100, y: 200 }} />
+          {members.current.map((member) => (
+            <UserPin
+              key={member.uid}
+              color={theme.colors.accent}
+              position={member.location}
+            />
+          ))}
         </View>
       </PanPinchView>
       <View

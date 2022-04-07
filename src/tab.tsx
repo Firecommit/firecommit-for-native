@@ -11,9 +11,9 @@ export const BottomTabNavigator: FC = () => {
   return (
     <Tab.Navigator
       shifting
-      sceneAnimationEnabled={false}
+      sceneAnimationEnabled
       activeColor={theme.colors.primary}
-      barStyle={{ backgroundColor: '#fff' }}
+      barStyle={{ backgroundColor: '#fff', height: 82 }}
     >
       <Tab.Screen
         name="Map"
