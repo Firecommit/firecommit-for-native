@@ -1,13 +1,39 @@
-import React from 'react';
+import React, { useContext, useEffect, useState } from 'react';
 import { createDrawerNavigator } from '@react-navigation/drawer';
-import { TouchableOpacity } from 'react-native';
-import { Avatar, Title } from 'react-native-paper';
+import { Image, TouchableOpacity } from 'react-native';
+import { Title } from 'react-native-paper';
 import { DrawerContent } from './components/DrawerContent';
 import { MaterialHeader } from './components/MaterialHeader';
 import { MapScreen } from './screens/MapScreen';
+import { ServerContext } from './contexts/ServerProvider';
+import { AuthContext } from './contexts/AuthProvider';
+import { auth, storage } from '../firebase';
+import { DialogContext } from './contexts/DialogProvider';
 
 export const DrawerNavigator = () => {
   const Drawer = createDrawerNavigator();
+  const { data } = useContext(ServerContext);
+  const { currentUser } = useContext(AuthContext);
+  const { displayError } = useContext(DialogContext);
+  const [url, setUrl] = useState<string>('');
+
+  useEffect(() => {
+    if (data && currentUser.auth) {
+      auth.onAuthStateChanged((user) => {
+        if (user) {
+          storage
+            .ref()
+            .child(`icons/${data.id}.png`)
+            .getDownloadURL()
+            .then((res) => {
+              setUrl(res);
+            })
+            .catch((res) => displayError({ msg: res.message }));
+        }
+      });
+    }
+  }, [data, currentUser]);
+
   return (
     <Drawer.Navigator drawerContent={(props) => <DrawerContent {...props} />}>
       <Drawer.Screen
@@ -24,14 +50,22 @@ export const DrawerNavigator = () => {
                 }}
                 style={{ marginLeft: 16, marginRight: 8 }}
               >
-                <Avatar.Image
-                  size={40}
-                  source={{
-                    uri: 'https://pbs.twimg.com/profile_images/952545910990495744/b59hSXUd_400x400.jpg',
-                  }}
-                />
+                {url !== '' ? (
+                  <Image
+                    style={{
+                      borderWidth: 0.5,
+                      borderColor: '#ccc',
+                      borderRadius: 5,
+                    }}
+                    width={40}
+                    height={40}
+                    source={{
+                      uri: url,
+                    }}
+                  />
+                ) : null}
               </TouchableOpacity>
-              <Title>山羽歯科医院</Title>
+              <Title>{data?.name}</Title>
             </MaterialHeader>
           ),
         }}

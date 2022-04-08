@@ -3,10 +3,11 @@ import React, {
   FC,
   useContext,
   useEffect,
+  useRef,
   useState,
 } from 'react';
 import { AsyncStorageContext } from './AsyncStorageProvider';
-import { db } from '../../firebase';
+import { auth, db, storage as firestorage } from '../../firebase';
 import { AuthContext } from './AuthProvider';
 import { DialogContext } from './DialogProvider';
 
@@ -24,6 +25,7 @@ type ServerProps = {
   LoginServer: (code: string) => void;
   LogoutServer: (code: string) => void;
   getServerName: (code: string) => string | undefined;
+  getServerIcon: (code: string) => string | undefined;
 };
 
 export const ServerContext = createContext<ServerProps>({
@@ -32,6 +34,7 @@ export const ServerContext = createContext<ServerProps>({
   LoginServer: (code: string) => {},
   LogoutServer: (code: string) => {},
   getServerName: (code: string) => '',
+  getServerIcon: (code: string) => '',
 });
 
 export const ServerProvider: FC = ({ children }) => {
@@ -40,6 +43,7 @@ export const ServerProvider: FC = ({ children }) => {
   const { displayError } = useContext(DialogContext);
   const [isLogin, setIsLogin] = useState(storage?.['@server'] === 'true');
   const { currentUser } = useContext(AuthContext);
+  const iconURL = useRef<string>();
 
   const getServerName = (code: string) => {
     let name;
@@ -47,6 +51,21 @@ export const ServerProvider: FC = ({ children }) => {
       name = snapshot.val().name;
     });
     return name;
+  };
+
+  const getServerIcon = (code: string) => {
+    auth.onAuthStateChanged((user) => {
+      if (user)
+        firestorage
+          .ref()
+          .child(`icons/${code}.png`)
+          .getDownloadURL()
+          .then((url) => {
+            iconURL.current = url;
+          })
+          .catch((res) => displayError({ msg: res.message }));
+    });
+    return iconURL.current;
   };
 
   const LoginServer = (code: string) => {
@@ -134,9 +153,16 @@ export const ServerProvider: FC = ({ children }) => {
 
   return (
     <ServerContext.Provider
-      value={{ data, isLogin, LoginServer, LogoutServer, getServerName }}
+      value={{
+        data,
+        isLogin,
+        LoginServer,
+        LogoutServer,
+        getServerName,
+        getServerIcon,
+      }}
     >
-      {children}
+      {data ? children : null}
     </ServerContext.Provider>
   );
 };

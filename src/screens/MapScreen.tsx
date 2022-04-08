@@ -110,8 +110,8 @@ export const MapScreen = () => {
     }
   }, [data, currentUser]);
 
-  const panX = -(position.x - RNImageRef.current.width / 6);
-  const panY = -(position.y - RNImageRef.current.height / 6);
+  const panX = -(position.x + 6 - RNImageRef.current.width / 6);
+  const panY = -(position.y + 6 - RNImageRef.current.height / 6);
 
   useSensorListener(
     'fusion',
@@ -187,11 +187,7 @@ export const MapScreen = () => {
             heading={heading.origin}
           />
           {members.current.map((member) => (
-            <UserPin
-              key={member.uid}
-              color={theme.colors.accent}
-              position={member.location}
-            />
+            <UserPin color={theme.colors.accent} position={member.location} />
           ))}
         </View>
       </PanPinchView>
@@ -210,7 +206,6 @@ export const MapScreen = () => {
         <ToggleButton.Group value={toggle} onValueChange={() => {}}>
           {layers.current.map((layer, idx) => (
             <ToggleButton
-              key={layer}
               color={toggle === layer ? theme.colors.primary : '#999'}
               icon={`numeric-${idx + 1}`}
               value={layer}

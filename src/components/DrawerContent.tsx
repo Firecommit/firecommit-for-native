@@ -1,6 +1,12 @@
-import React, { useContext } from 'react';
-import { View, Text } from 'react-native';
-import { Headline, Drawer, List, IconButton } from 'react-native-paper';
+import React, { useContext, useEffect, useMemo, useState } from 'react';
+import { View, Text, Image } from 'react-native';
+import {
+  Headline,
+  Drawer,
+  List,
+  IconButton,
+  useTheme,
+} from 'react-native-paper';
 import {
   DrawerContentComponentProps,
   DrawerContentScrollView,
@@ -18,9 +24,11 @@ export const DrawerContent = (props: DrawerContentComponentProps) => {
   const { currentUser, signout } = useContext(AuthContext);
   const { presentModalHandler, showBottomSheet } =
     useContext(BottomSheetContext);
-  const { data, LoginServer, LogoutServer, getServerName } =
+  const { data, LoginServer, LogoutServer, getServerName, getServerIcon } =
     useContext(ServerContext);
+
   const { showActionSheetWithOptions } = useActionSheet();
+  const theme = useTheme();
 
   return (
     <View style={{ flex: 1, paddingTop: 52 }}>
@@ -32,10 +40,41 @@ export const DrawerContent = (props: DrawerContentComponentProps) => {
           {Object.keys({ ...currentUser.data?.workspace }).map((key) => (
             <List.Item
               style={data?.id === key ? { backgroundColor: '#eee' } : {}}
-              key={key}
               title={getServerName(key)}
               description={key}
-              left={() => <List.Icon icon="folder" />}
+              left={() => (
+                <View
+                  style={[
+                    {
+                      width: 64,
+                      height: 64,
+                      padding: 3,
+                      justifyContent: 'center',
+                      alignItems: 'center',
+                    },
+                    data?.id === key
+                      ? {
+                          borderWidth: 3,
+                          borderColor: theme.colors.primary,
+                          borderRadius: 5,
+                        }
+                      : null,
+                  ]}
+                >
+                  <Image
+                    style={{
+                      width: 50,
+                      height: 50,
+                      borderWidth: 0.5,
+                      borderColor: '#ccc',
+                      borderRadius: 5,
+                    }}
+                    source={{
+                      uri: getServerIcon(key),
+                    }}
+                  />
+                </View>
+              )}
               right={() => (
                 <IconButton
                   icon="dots-vertical"
