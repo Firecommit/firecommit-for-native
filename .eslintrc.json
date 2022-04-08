@@ -22,6 +22,7 @@
   "rules": {
     "react/require-default-props": "off",
     "react/jsx-props-no-spreading": "off",
+    "no-return-await": "off",
     "no-nested-ternary": "off",
     "no-plusplus": "off",
     "no-unused-vars": "off",

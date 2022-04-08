@@ -8,5 +8,6 @@ import { name as appName } from './app.json';
 
 LogBox.ignoreLogs(['Require cycle:']);
 LogBox.ignoreLogs(['Sending']);
+LogBox.ignoreLogs(['Each child in a list should have a unique "key" prop.']);
 
 AppRegistry.registerComponent(appName, () => App);
