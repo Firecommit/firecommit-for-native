@@ -202,7 +202,7 @@ export const MapScreen = () => {
         style={[
           {
             position: 'absolute',
-            left: 330,
+            left: window.width * 0.85,
             top: 30,
             backgroundColor: '#fff',
             borderRadius: 3,
@@ -225,7 +225,7 @@ export const MapScreen = () => {
         style={{
           position: 'absolute',
           left: window.width * 0.82,
-          top: window.height * 0.6,
+          bottom: window.height * 0.04,
         }}
       >
         <BadgeButton
