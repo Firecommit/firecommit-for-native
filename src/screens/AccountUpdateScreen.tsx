@@ -3,11 +3,13 @@ import { Image, View } from 'react-native';
 import { Button, TextInput, useTheme } from 'react-native-paper';
 import { Asset, launchImageLibrary } from 'react-native-image-picker';
 import { AuthContext } from '../contexts/AuthProvider';
+import { storage } from '../../firebase';
 
 export const AccountPictureUpdateScreen: FC = () => {
-  const { update } = useContext(AuthContext);
   const [image, setImage] = useState<Asset>();
   const [loading, setLoading] = useState(false);
+  const { update, currentUser } = useContext(AuthContext);
+
   const theme = useTheme();
 
   return (
@@ -60,11 +62,19 @@ export const AccountPictureUpdateScreen: FC = () => {
         loading={loading}
         dark
         disabled={!image}
-        onPress={() => {
+        onPress={async () => {
           setLoading(true);
-          update('picture', `${image?.uri}`).then(() => {
-            setTimeout(() => setLoading(false), 1000);
-          });
+          const blob = await fetch(`${image?.uri}`).then((res) => res.blob());
+          storage
+            .ref(`users/icon/${currentUser.auth?.uid}.png`)
+            .put(blob)
+            .then((snapshot) => {
+              snapshot.ref.getDownloadURL().then((url) => {
+                update('picture', `${url}`).then(() => {
+                  setTimeout(() => setLoading(false), 1000);
+                });
+              });
+            });
         }}
       >
         保存

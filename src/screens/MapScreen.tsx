@@ -19,15 +19,16 @@ type RNImageRefType = {
   height: number;
 };
 
-type MembersType = Array<{
-  uid: string;
-  name: string;
-  email: string;
-  location: {
-    x: number;
-    y: number;
+type MembersType = {
+  [uid: string]: {
+    name: string;
+    email: string;
+    location: {
+      x: number;
+      y: number;
+    };
   };
-}>;
+};
 
 export const MapScreen = () => {
   const [position, setPosition] = useState({ x: 0, y: 0 });
@@ -35,7 +36,7 @@ export const MapScreen = () => {
   const [isCurrentPos, setIsCurrentPos] = useState(false);
   const [toggle, setToggle] = useState<string | null>('layer1');
   const layers = useRef<Array<string>>([]);
-  const members = useRef<MembersType>([]);
+  const members = useRef<MembersType>({});
   const RNImageRef = useRef<RNImageRefType>({ uri: '', width: 0, height: 0 });
   const { data } = useContext(ServerContext);
   const { displayError } = useContext(DialogContext);
@@ -94,16 +95,16 @@ export const MapScreen = () => {
       db.ref(`workspace/${data.id}`)
         .child('members')
         .on('value', (snapshot) => {
-          members.current = [];
           Object.keys(snapshot.val()).forEach((uid) => {
             if (uid !== 'undefined' && currentUser.auth?.uid !== uid) {
-              db.ref(`users/${uid}`)
-                .child('coordinate')
-                .on('value', (coordinate) => {
-                  const { x, y } = coordinate.val();
-                  const location = { x, y };
-                  members.current.push({ uid, name: '', email: '', location });
-                });
+              db.ref(`users/${uid}`).on('value', (userData) => {
+                const { coordinate } = userData.val();
+                members.current[uid] = {
+                  name: '',
+                  email: '',
+                  location: coordinate,
+                };
+              });
             }
           });
         });
@@ -186,8 +187,8 @@ export const MapScreen = () => {
             position={position}
             heading={heading.origin}
           />
-          {members.current.map((member) => (
-            <UserPin color={theme.colors.accent} position={member.location} />
+          {Object.entries(members.current).map(([key, val]) => (
+            <UserPin color={theme.colors.accent} position={val.location} />
           ))}
         </View>
       </PanPinchView>
