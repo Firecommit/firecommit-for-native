@@ -162,7 +162,7 @@ export const ServerProvider: FC = ({ children }) => {
         getServerIcon,
       }}
     >
-      {data ? children : null}
+      {children}
     </ServerContext.Provider>
   );
 };
