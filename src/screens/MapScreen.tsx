@@ -1,5 +1,10 @@
 import React, { useContext, useEffect, useRef, useState } from 'react';
-import { Image as RNImage, StyleSheet, View } from 'react-native';
+import {
+  Image as RNImage,
+  StyleSheet,
+  useWindowDimensions,
+  View,
+} from 'react-native';
 import { ToggleButton, useTheme } from 'react-native-paper';
 import { PanPinchView } from '../components/PanPinchView';
 import { UserPin } from '../components/UserPin';
@@ -46,6 +51,7 @@ export const MapScreen = () => {
   const [attitude, setAttitudeSensors] = useAttitude();
   const [ref, heading, setHeadingSensors] = useHeading(attitude);
   const [step, setStepSensor] = useStep(attitude);
+  const window = useWindowDimensions();
 
   useEffect(() => {
     auth.onAuthStateChanged((user) => {
@@ -215,7 +221,13 @@ export const MapScreen = () => {
           ))}
         </ToggleButton.Group>
       </View>
-      <View style={{ position: 'absolute', left: 320, top: 500 }}>
+      <View
+        style={{
+          position: 'absolute',
+          left: window.width * 0.82,
+          top: window.height * 0.6,
+        }}
+      >
         <BadgeButton
           icon="near-me"
           color={isCurrentPos ? theme.colors.primary : '#ccc'}
