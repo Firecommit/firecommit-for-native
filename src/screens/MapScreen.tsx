@@ -45,7 +45,7 @@ export const MapScreen = () => {
   const RNImageRef = useRef<RNImageRefType>({ uri: '', width: 0, height: 0 });
   const { data } = useContext(ServerContext);
   const { displayError } = useContext(DialogContext);
-  const { currentUser } = useContext(AuthContext);
+  const { currentUser, update } = useContext(AuthContext);
 
   const theme = useTheme();
   const [attitude, setAttitudeSensors] = useAttitude();
@@ -138,6 +138,12 @@ export const MapScreen = () => {
       return { x: pos.x + sx, y: pos.y + sy };
     });
   }, [step]);
+
+  useEffect(() => {
+    update('location', position).catch((res) =>
+      displayError({ msg: res.message })
+    );
+  }, [position]);
 
   const styles = StyleSheet.create({
     wrapper: {

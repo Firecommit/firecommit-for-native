@@ -30,8 +30,8 @@ type AuthContextProps = {
   signin: (email: string, password: string) => void;
   signout: () => void;
   update: (
-    type: 'picture' | 'name' | 'email' | 'password',
-    val: string
+    type: 'picture' | 'name' | 'email' | 'password' | 'location',
+    val: any
   ) => Promise<void>;
 };
 
@@ -56,8 +56,8 @@ export const AuthProvider: FC = ({ children }) => {
   );
 
   const update = async (
-    type: 'picture' | 'name' | 'email' | 'password',
-    val: string
+    type: 'picture' | 'name' | 'email' | 'password' | 'location',
+    val: any
   ) => {
     auth.onAuthStateChanged((user) => {
       if (user) {
@@ -121,6 +121,9 @@ export const AuthProvider: FC = ({ children }) => {
                 });
               })
               .catch((res) => displayError({ msg: res.message }));
+            break;
+          case 'location':
+            db.ref('users').child(user.uid).update({ coordinate: val });
             break;
           default:
             break;
