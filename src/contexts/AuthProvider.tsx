@@ -86,6 +86,7 @@ export const AuthProvider: FC = ({ children }) => {
                     ...u,
                     auth: auth.currentUser,
                   }));
+                  db.ref('users').child(user.uid).update({ name: val });
                 })
                 .catch((res) => displayError({ msg: res.message }));
             } else {
@@ -104,6 +105,7 @@ export const AuthProvider: FC = ({ children }) => {
                   mode: 'set',
                   attributes: { key: '@email', val },
                 });
+                db.ref('users').child(user.uid).update({ email: val });
               })
               .catch((res) => displayError({ msg: res.message }));
             break;
@@ -137,6 +139,8 @@ export const AuthProvider: FC = ({ children }) => {
       msg: !name.length ? '- 氏名を入力してください' : '',
     };
     const data = {
+      name,
+      email,
       coordinate: {
         x: 0,
         y: 0,
