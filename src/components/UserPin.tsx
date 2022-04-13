@@ -14,9 +14,17 @@ type UserPinProps = {
     y: number;
   };
   heading?: number;
+  onPress?: () => void;
+  onMove?: () => void;
 };
 
-export const UserPin = ({ color, position, heading }: UserPinProps) => {
+export const UserPin = ({
+  color,
+  position,
+  heading,
+  onPress,
+  onMove,
+}: UserPinProps) => {
   const borderAnimation = useSharedValue(1);
   const left = useSharedValue(0);
   const top = useSharedValue(0);
@@ -40,6 +48,7 @@ export const UserPin = ({ color, position, heading }: UserPinProps) => {
   useEffect(() => {
     left.value = withTiming(position.x);
     top.value = withTiming(position.y);
+    if (onMove) onMove();
   }, [position]);
 
   useEffect(() => {
@@ -93,6 +102,7 @@ export const UserPin = ({ color, position, heading }: UserPinProps) => {
 
   return (
     <Animated.View
+      onTouchStart={onPress}
       style={[
         StyleSheet.absoluteFillObject,
         styles.wrapper,

@@ -1,4 +1,4 @@
-import React, { useContext, useEffect, useMemo, useState } from 'react';
+import React, { useContext, useEffect } from 'react';
 import { View, Text, Image } from 'react-native';
 import {
   Headline,
@@ -22,8 +22,7 @@ import { AddServerScreen } from '../screens/AddServerScreen';
 
 export const DrawerContent = (props: DrawerContentComponentProps) => {
   const { currentUser, signout } = useContext(AuthContext);
-  const { presentModalHandler, showBottomSheet } =
-    useContext(BottomSheetContext);
+  const { presentModalHandler } = useContext(BottomSheetContext);
   const { data, LoginServer, LogoutServer, getServerName, getServerIcon } =
     useContext(ServerContext);
 
@@ -133,8 +132,11 @@ export const DrawerContent = (props: DrawerContentComponentProps) => {
           }}
           label="マップサーバーを追加する"
           onPress={() => {
-            showBottomSheet(<AddServerScreen />);
-            presentModalHandler();
+            presentModalHandler({
+              snapPoints: ['94%'],
+              content: () => <AddServerScreen />,
+              backdrop: true,
+            });
           }}
         />
         <DrawerItem
@@ -143,12 +145,15 @@ export const DrawerContent = (props: DrawerContentComponentProps) => {
           }}
           label="環境設定"
           onPress={() => {
-            showBottomSheet(
-              <View style={{ flex: 1, alignItems: 'center' }}>
-                <Text>Hello world</Text>
-              </View>
-            );
-            presentModalHandler();
+            presentModalHandler({
+              snapPoints: ['94%'],
+              content: () => (
+                <View style={{ flex: 1, alignItems: 'center' }}>
+                  <Text>Hello world</Text>
+                </View>
+              ),
+              backdrop: true,
+            });
           }}
         />
         <DrawerItem

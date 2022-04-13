@@ -23,10 +23,10 @@ type PanContextType = {
 
 type PanPinchViewProps = {
   children: ReactNode;
-  onTracking?: () => {
-    panX: number;
-    panY: number;
-  };
+  tracking?: {
+    x: number;
+    y: number;
+  } | null;
   onPanStart?: () => void;
   onPanMove?: () => void;
   onPinchStart?: () => void;
@@ -35,7 +35,7 @@ type PanPinchViewProps = {
 
 export const PanPinchView = ({
   children,
-  onTracking,
+  tracking,
   onPanStart,
   onPanMove,
   onPinchStart,
@@ -57,13 +57,13 @@ export const PanPinchView = ({
   > | null>(null);
 
   useEffect(() => {
-    if (onTracking) {
-      translateX.value = withTiming(onTracking().panX);
-      translateY.value = withTiming(onTracking().panY);
+    if (tracking) {
+      translateX.value = withTiming(tracking.x);
+      translateY.value = withTiming(tracking.y);
       focalX.value = window.width / 2;
       focalY.value = window.height / 2;
     }
-  }, [onTracking]);
+  }, [tracking]);
 
   useEffect(() => {
     if (onPanStart) onPanStart();
@@ -103,7 +103,7 @@ export const PanPinchView = ({
       },
       onActive: (event) => {
         scale.value = savedScale.value * event.scale;
-        if (onTracking) {
+        if (tracking) {
           focalX.value = window.width / 2;
           focalY.value = window.height / 2;
         } else {

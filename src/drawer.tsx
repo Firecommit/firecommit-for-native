@@ -9,13 +9,17 @@ import { ServerContext } from './contexts/ServerProvider';
 import { AuthContext } from './contexts/AuthProvider';
 import { auth, storage } from '../firebase';
 import { DialogContext } from './contexts/DialogProvider';
+import { BottomSheetContext } from './contexts/BottomSheetProvider';
 
 export const DrawerNavigator = () => {
-  const Drawer = createDrawerNavigator();
+  const [url, setUrl] = useState<string>('');
+
   const { data } = useContext(ServerContext);
   const { currentUser } = useContext(AuthContext);
   const { displayError } = useContext(DialogContext);
-  const [url, setUrl] = useState<string>('');
+  const { closeModalHandler } = useContext(BottomSheetContext);
+
+  const Drawer = createDrawerNavigator();
 
   useEffect(() => {
     if (data && currentUser.auth) {
@@ -47,6 +51,7 @@ export const DrawerNavigator = () => {
               <TouchableOpacity
                 onPress={() => {
                   navigation.openDrawer();
+                  closeModalHandler();
                 }}
                 style={{ marginLeft: 16, marginRight: 8 }}
               >
