@@ -5,7 +5,8 @@ import React, {
   useEffect,
   useState,
 } from 'react';
-import firebase, { auth, db } from '../../firebase';
+import { AppState } from 'react-native';
+import firebase, { auth, db, storage as firestorage } from '../../firebase';
 import { ErrorProps } from '../types';
 import { AsyncStorageContext } from './AsyncStorageProvider';
 import { DialogContext } from './DialogProvider';
@@ -13,6 +14,10 @@ import { DialogContext } from './DialogProvider';
 type UserProps = {
   auth?: firebase.User | null;
   data?: {
+    email: string;
+    name: string;
+    photoURL: string;
+    state: 'online' | 'offline';
     coordinate: {
       x: number;
       y: number;
@@ -30,7 +35,7 @@ type AuthContextProps = {
   signin: (email: string, password: string) => void;
   signout: () => void;
   update: (
-    type: 'picture' | 'name' | 'email' | 'password' | 'location',
+    type: 'picture' | 'name' | 'email' | 'password' | 'location' | 'state',
     val: any
   ) => Promise<void>;
 };
@@ -56,7 +61,7 @@ export const AuthProvider: FC = ({ children }) => {
   );
 
   const update = async (
-    type: 'picture' | 'name' | 'email' | 'password' | 'location',
+    type: 'picture' | 'name' | 'email' | 'password' | 'location' | 'state',
     val: any
   ) => {
     auth.onAuthStateChanged((user) => {
@@ -71,6 +76,7 @@ export const AuthProvider: FC = ({ children }) => {
                     ...u,
                     auth: auth.currentUser,
                   }));
+                  db.ref('users').child(user.uid).update({ photoURL: val });
                 })
                 .catch((res) => displayError({ msg: res.message }));
             } else {
@@ -127,6 +133,9 @@ export const AuthProvider: FC = ({ children }) => {
           case 'location':
             db.ref('users').child(user.uid).update({ coordinate: val });
             break;
+          case 'state':
+            db.ref('users').child(user.uid).update({ state: val });
+            break;
           default:
             break;
         }
@@ -141,18 +150,23 @@ export const AuthProvider: FC = ({ children }) => {
     const data = {
       name,
       email,
+      photoURL:
+        'https://firebasestorage.googleapis.com/v0/b/firecommit-1e1d5.appspot.com/o/users%2Ficon%2Fdefault_user.png?alt=media&token=8f30cf5a-db74-4a09-b4e6-ec26670ba538',
+      state: 'online',
       coordinate: {
         x: 0,
         y: 0,
       },
       workspace: {},
     };
+
     auth
       .createUserWithEmailAndPassword(email, password)
       .then((userCredential) => {
         const { user } = userCredential;
         user?.updateProfile({
           displayName: name,
+          photoURL: data.photoURL,
         });
         db.ref(`users/${user?.uid}`)
           .set(data)
@@ -171,6 +185,10 @@ export const AuthProvider: FC = ({ children }) => {
         storageData({
           mode: 'set',
           attributes: { key: '@password', val: password },
+        });
+        setCurrentUser({
+          auth: user,
+          data: { ...data, state: 'online', workspace: {} },
         });
         setIsSignedIn(true);
       })
@@ -199,22 +217,20 @@ export const AuthProvider: FC = ({ children }) => {
         db.ref(`users/${user?.uid}`).on('value', (snapshot) => {
           setCurrentUser({ auth: user, data: snapshot.val() });
         });
+        update('state', 'online');
       })
       .catch((res) => {
         displayError({ msg: res.message });
+        signout();
       });
   };
 
   const signout = () => {
+    storageData({ mode: 'clear' });
     auth
       .signOut()
       .then(() => {
-        storageData({ mode: 'remove', attributes: { key: '@email' } });
-        storageData({ mode: 'remove', attributes: { key: '@password' } });
-        storageData({
-          mode: 'set',
-          attributes: { key: '@remember', val: 'false' },
-        });
+        update('state', 'offline');
         setIsSignedIn(false);
       })
       .catch((res) => {
@@ -230,6 +246,10 @@ export const AuthProvider: FC = ({ children }) => {
         }
       }
     }
+    AppState.addEventListener('change', (state) => {
+      if (state === 'inactive') update('state', 'offline');
+      if (['active', 'background'].includes(state)) update('state', 'online');
+    });
   }, []);
 
   return (
