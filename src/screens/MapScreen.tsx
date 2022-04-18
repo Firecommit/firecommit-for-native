@@ -6,7 +6,7 @@ import {
   useWindowDimensions,
   View,
 } from 'react-native';
-import { ToggleButton, useTheme } from 'react-native-paper';
+import { Caption, Headline, ToggleButton, useTheme } from 'react-native-paper';
 import Animated, {
   useAnimatedStyle,
   useSharedValue,
@@ -35,6 +35,8 @@ type MembersType = {
   [uid: string]: {
     name: string;
     email: string;
+    photoURL: string;
+    state: string;
     location: {
       x: number;
       y: number;
@@ -54,8 +56,8 @@ export const MapScreen = () => {
   const [isPos, setIsPos] = useState(false);
   const [isCurrentPos, setIsCurrentPos] = useState(false);
   const [toggle, setToggle] = useState<string | null>('layer1');
+  const [members, setMembers] = useState<MembersType>({});
   const layers = useRef<Array<string>>([]);
-  const members = useRef<MembersType>({});
   const RNImageRef = useRef<RNImageRefType>({ uri: '', width: 0, height: 0 });
   const { data } = useContext(ServerContext);
   const { displayError } = useContext(DialogContext);
@@ -74,7 +76,7 @@ export const MapScreen = () => {
   useAnimatedModalHandler({
     onAnimated: (from, to) => {
       if (to === 0) {
-        badgeBottom.value = withTiming(window.height * 0.25);
+        badgeBottom.value = withTiming(window.height * 0.2);
       } else if (to === -1) {
         badgeBottom.value = withTiming(window.height * 0.04);
       }
@@ -103,7 +105,8 @@ export const MapScreen = () => {
   }, [toggle]);
 
   useEffect(() => {
-    if (data && currentUser.auth) {
+    if (data) {
+      setMembers({});
       auth.onAuthStateChanged((user) => {
         if (user) {
           setToggle('layer1');
@@ -128,26 +131,52 @@ export const MapScreen = () => {
               });
             })
             .catch((res) => displayError({ msg: res.message }));
+          db.ref(`workspace/${data.id}`)
+            .child('members')
+            .on('value', (snapshot) => {
+              Object.keys(snapshot.val()).forEach((uid) => {
+                if (uid !== 'undefined') {
+                  db.ref(`users/${uid}`).on('value', (userData) => {
+                    const {
+                      name,
+                      email,
+                      photoURL,
+                      state,
+                      coordinate,
+                      workspace,
+                    } = userData.val();
+                    if (
+                      user.uid !== uid &&
+                      workspace[data.id] &&
+                      state === 'online'
+                    ) {
+                      setMembers((m) => ({
+                        ...m,
+                        [uid]: {
+                          name,
+                          email,
+                          photoURL,
+                          state,
+                          location: coordinate,
+                        },
+                      }));
+                    } else {
+                      setPosition(coordinate);
+                    }
+                  });
+                }
+              });
+            });
         }
       });
-      db.ref(`workspace/${data.id}`)
-        .child('members')
-        .on('value', (snapshot) => {
-          Object.keys(snapshot.val()).forEach((uid) => {
-            if (uid !== 'undefined' && currentUser.auth?.uid !== uid) {
-              db.ref(`users/${uid}`).on('value', (userData) => {
-                const { name, email, coordinate } = userData.val();
-                members.current[uid] = {
-                  name,
-                  email,
-                  location: coordinate,
-                };
-              });
-            }
-          });
-        });
     }
-  }, [data, currentUser]);
+  }, [data]);
+
+  useEffect(() => {
+    update('location', position).catch((res) =>
+      displayError({ msg: res.message })
+    );
+  }, [position]);
 
   useSensorListener(
     'fusion',
@@ -167,12 +196,6 @@ export const MapScreen = () => {
       return { x: pos.x + sx, y: pos.y + sy };
     });
   }, [step]);
-
-  useEffect(() => {
-    update('location', position).catch((res) =>
-      displayError({ msg: res.message })
-    );
-  }, [position]);
 
   const styles = StyleSheet.create({
     wrapper: {
@@ -243,21 +266,71 @@ export const MapScreen = () => {
               }
             }}
           />
-          {Object.entries(members.current).map(([key, val]) => (
+          {Object.entries(members).map(([key, val]) => (
             <UserPin
               key={key}
-              color={theme.colors.accent}
+              color={val.state === 'online' ? theme.colors.accent : 'gray'}
               position={val.location}
               onPress={() => {
                 presentModalHandler({
-                  snapPoints: ['30%'],
-                  content: () => (
-                    <View style={{ flex: 1, alignItems: 'center' }}>
-                      <Text>name:{val.name}</Text>
-                      <Text>email:{val.email}</Text>
-                      <Text>
-                        x:{val.location.x}, y:{val.location.y}
-                      </Text>
+                  snapPoints: [window.height > 800 ? '25%' : '30%'],
+                  component: () => (
+                    <View style={{ paddingHorizontal: 20 }}>
+                      <View
+                        style={{
+                          flexDirection: 'row',
+                          justifyContent: 'flex-start',
+                          alignItems: 'flex-start',
+                        }}
+                      >
+                        <RNImage
+                          style={{
+                            marginRight: 20,
+                            borderRadius: 10,
+                            borderWidth: 0.5,
+                            borderColor: '#ccc',
+                          }}
+                          width={140}
+                          height={140}
+                          source={{ uri: val.photoURL }}
+                        />
+                        <View style={{ width: window.width - 200 }}>
+                          <Headline>{val.name}</Headline>
+                          <Caption numberOfLines={1} ellipsizeMode="tail">
+                            UID: {key}
+                          </Caption>
+                          <Caption numberOfLines={1} ellipsizeMode="tail">
+                            Email: {val.email}
+                          </Caption>
+                          <View
+                            style={{
+                              flexDirection: 'row',
+                              alignItems: 'center',
+                            }}
+                          >
+                            <View
+                              style={{
+                                width: 5,
+                                height: 5,
+                                marginRight: 5,
+                                borderRadius: 10,
+                                backgroundColor:
+                                  val.state === 'online' ? 'green' : 'gray',
+                              }}
+                            />
+                            <Text
+                              style={{
+                                color:
+                                  val.state === 'online' ? 'green' : 'gray',
+                              }}
+                            >
+                              {val.state === 'online'
+                                ? 'オンライン'
+                                : 'オフライン'}
+                            </Text>
+                          </View>
+                        </View>
+                      </View>
                     </View>
                   ),
                 });
