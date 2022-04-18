@@ -8,15 +8,15 @@ import { MapScreen } from './screens/MapScreen';
 import { ServerContext } from './contexts/ServerProvider';
 import { AuthContext } from './contexts/AuthProvider';
 import { auth, storage } from '../firebase';
-import { DialogContext } from './contexts/DialogProvider';
 import { BottomSheetContext } from './contexts/BottomSheetProvider';
 
 export const DrawerNavigator = () => {
-  const [url, setUrl] = useState<string>('');
+  const [url, setUrl] = useState<string>(
+    'https://firebasestorage.googleapis.com/v0/b/firecommit-1e1d5.appspot.com/o/icons%2Fdefault_server.png?alt=media&token=e4606cfd-da50-4068-9f71-316e3d8846b8'
+  );
 
   const { data } = useContext(ServerContext);
   const { currentUser } = useContext(AuthContext);
-  const { displayError } = useContext(DialogContext);
   const { closeModalHandler } = useContext(BottomSheetContext);
 
   const Drawer = createDrawerNavigator();
@@ -31,8 +31,7 @@ export const DrawerNavigator = () => {
             .getDownloadURL()
             .then((res) => {
               setUrl(res);
-            })
-            .catch((res) => displayError({ msg: res.message }));
+            });
         }
       });
     }
@@ -55,20 +54,18 @@ export const DrawerNavigator = () => {
                 }}
                 style={{ marginLeft: 16, marginRight: 8 }}
               >
-                {url !== '' ? (
-                  <Image
-                    style={{
-                      borderWidth: 0.5,
-                      borderColor: '#ccc',
-                      borderRadius: 5,
-                    }}
-                    width={40}
-                    height={40}
-                    source={{
-                      uri: url,
-                    }}
-                  />
-                ) : null}
+                <Image
+                  style={{
+                    borderWidth: 0.5,
+                    borderColor: '#ccc',
+                    borderRadius: 5,
+                  }}
+                  width={40}
+                  height={40}
+                  source={{
+                    uri: url,
+                  }}
+                />
               </TouchableOpacity>
               <Title>{data?.name}</Title>
             </MaterialHeader>
