@@ -19,7 +19,7 @@ import Animated, {
 
 type ModalOptionsType = {
   snapPoints: string[];
-  content: () => ReactNode;
+  component: () => ReactNode;
   backdrop?: boolean;
   bottom?: number;
 };
@@ -42,7 +42,7 @@ export const BottomSheetContext = createContext<BottomSheetProps>({
 });
 
 export const BottomSheetProvider: FC = ({ children }) => {
-  const [content, setContent] = useState<ReactNode>(null);
+  const [component, setComponent] = useState<ReactNode>(null);
   const [isBackdrop, setIsBackdrop] = useState<boolean>(false);
   const bottom = useRef<number>(0);
   const snapPoints = useRef<string[]>([]);
@@ -58,7 +58,7 @@ export const BottomSheetProvider: FC = ({ children }) => {
     snapPoints.current = options.snapPoints;
     setIsBackdrop(options.backdrop ? options.backdrop : false);
     bottom.current = options.bottom ? options.bottom : 0;
-    setContent(options.content);
+    setComponent(options.component);
     bottomSheetModalRef.current?.present();
   }, []);
 
@@ -127,7 +127,7 @@ export const BottomSheetProvider: FC = ({ children }) => {
           }}
           onDismiss={modalHandler.current.onEnd}
         >
-          {content}
+          {component}
         </BottomSheetModal>
         {children}
       </BottomSheetModalProvider>

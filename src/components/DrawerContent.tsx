@@ -1,4 +1,4 @@
-import React, { useContext, useEffect } from 'react';
+import React, { useContext } from 'react';
 import { View, Text, Image } from 'react-native';
 import {
   Headline,
@@ -134,7 +134,7 @@ export const DrawerContent = (props: DrawerContentComponentProps) => {
           onPress={() => {
             presentModalHandler({
               snapPoints: ['94%'],
-              content: () => <AddServerScreen />,
+              component: () => <AddServerScreen />,
               backdrop: true,
             });
           }}
@@ -147,7 +147,7 @@ export const DrawerContent = (props: DrawerContentComponentProps) => {
           onPress={() => {
             presentModalHandler({
               snapPoints: ['94%'],
-              content: () => (
+              component: () => (
                 <View style={{ flex: 1, alignItems: 'center' }}>
                   <Text>Hello world</Text>
                 </View>
