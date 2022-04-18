@@ -11,7 +11,7 @@ export type AsyncDataProps = {
 };
 
 type StorageDataOptions = {
-  mode: 'set' | 'merge' | 'get_all' | 'remove' | 'clear';
+  mode: 'set' | 'merge' | 'remove' | 'clear';
   attributes?: {
     key: string;
     val?: string;
@@ -19,53 +19,43 @@ type StorageDataOptions = {
 };
 
 type AsyncStorageProps = {
-  storageData: (
-    option: StorageDataOptions
-  ) => Promise<AsyncDataProps | undefined>;
+  storageData: (option?: StorageDataOptions) => void;
   storage?: AsyncDataProps;
 };
 
-const storageData = async (option: StorageDataOptions) => {
-  try {
-    if (option.mode === 'set' && option.attributes && option.attributes.val) {
-      await AsyncStorage.setItem(option.attributes.key, option.attributes.val);
-    } else if (
-      option.mode === 'merge' &&
-      option.attributes &&
-      option.attributes.val
-    ) {
-      await AsyncStorage.mergeItem(
-        option.attributes.key,
-        option.attributes.val
-      );
-    } else if (option.mode === 'get_all') {
-      const keys = await AsyncStorage.getAllKeys();
-      const items = await AsyncStorage.multiGet(keys);
-      return Object.fromEntries(items);
-    } else if (option.mode === 'remove' && option.attributes) {
-      await AsyncStorage.removeItem(option.attributes.key);
-    } else if (option.mode === 'clear') {
-      await AsyncStorage.clear();
-    }
-    return undefined;
-  } catch (e) {
-    console.log(e);
-    return undefined;
-  }
-};
-
 export const AsyncStorageContext = createContext<AsyncStorageProps>({
-  storageData,
+  storageData: () => {},
   storage: undefined,
 });
 
 export const AsyncStorageProvider: FC = ({ children }) => {
   const [storage, setStorage] = useState<AsyncDataProps>();
 
-  useEffect(() => {
-    storageData({ mode: 'get_all' }).then((data) => {
-      setStorage(data);
+  const storageData = (option?: StorageDataOptions) => {
+    if (option) {
+      if (option.mode === 'set' && option.attributes && option.attributes.val) {
+        AsyncStorage.setItem(option.attributes.key, option.attributes.val);
+      } else if (
+        option.mode === 'merge' &&
+        option.attributes &&
+        option.attributes.val
+      ) {
+        AsyncStorage.mergeItem(option.attributes.key, option.attributes.val);
+      } else if (option.mode === 'remove' && option.attributes) {
+        AsyncStorage.removeItem(option.attributes.key);
+      } else if (option.mode === 'clear') {
+        AsyncStorage.clear();
+      }
+    }
+    AsyncStorage.getAllKeys().then((keys) => {
+      AsyncStorage.multiGet(keys).then((items) =>
+        setStorage(Object.fromEntries(items))
+      );
     });
+  };
+
+  useEffect(() => {
+    storageData();
   }, []);
 
   return (
