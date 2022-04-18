@@ -1,14 +1,15 @@
 import React, { useContext, useState } from 'react';
 import { View } from 'react-native';
-import { Caption, Headline, TextInput, Button } from 'react-native-paper';
+import { ScrollView } from 'react-native-gesture-handler';
+import { Caption, Headline, TextInput, Button, List } from 'react-native-paper';
 import { AuthContext } from '../contexts/AuthProvider';
 import { ServerContext } from '../contexts/ServerProvider';
 import { StackProps } from '../types';
 
 export const LoginServerScreen = ({ navigation }: StackProps) => {
   const [invCode, setInvCode] = useState<string>('');
-  const { signout } = useContext(AuthContext);
-  const { LoginServer } = useContext(ServerContext);
+  const { signout, currentUser } = useContext(AuthContext);
+  const { LoginServer, getServerName } = useContext(ServerContext);
 
   return (
     <View
@@ -59,6 +60,17 @@ export const LoginServerScreen = ({ navigation }: StackProps) => {
           サインアウト
         </Button>
       </View>
+      <List.Section style={{ flex: 1, width: '100%' }}>
+        <List.Subheader>参加済みのマップサーバー</List.Subheader>
+        <ScrollView>
+          {Object.keys({ ...currentUser.data?.workspace }).map((code) => (
+            <List.Item
+              title={getServerName(code)}
+              onPress={() => LoginServer(code)}
+            />
+          ))}
+        </ScrollView>
+      </List.Section>
     </View>
   );
 };
