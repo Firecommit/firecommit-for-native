@@ -37,6 +37,7 @@ type MembersType = {
     email: string;
     photoURL: string;
     state: string;
+    layer: number;
     location: {
       x: number;
       y: number;
@@ -55,9 +56,9 @@ export const MapScreen = () => {
   const [position, setPosition] = useState({ x: 0, y: 0 });
   const [isPos, setIsPos] = useState(false);
   const [isCurrentPos, setIsCurrentPos] = useState(false);
-  const [toggle, setToggle] = useState<string | null>('layer1');
+  const [layerNumber, setLayerNumber] = useState<number>(1);
   const [members, setMembers] = useState<MembersType>({});
-  const layers = useRef<Array<string>>([]);
+  const layerNames = useRef<Array<string>>([]);
   const RNImageRef = useRef<RNImageRefType>({ uri: '', width: 0, height: 0 });
   const { data } = useContext(ServerContext);
   const { displayError } = useContext(DialogContext);
@@ -92,7 +93,7 @@ export const MapScreen = () => {
       if (user && data) {
         storage
           .ref()
-          .child(`maps/${data.id}/${toggle}.png`)
+          .child(`maps/${data.id}/layer${layerNumber}.png`)
           .getDownloadURL()
           .then((url) => {
             RNImage.getSize(url, (width, height) => {
@@ -102,14 +103,26 @@ export const MapScreen = () => {
           .catch((res) => displayError({ msg: res.message }));
       }
     });
-  }, [toggle]);
+    update('layer', layerNumber);
+  }, [layerNumber]);
 
   useEffect(() => {
     if (data) {
       setMembers({});
       auth.onAuthStateChanged((user) => {
         if (user) {
-          setToggle('layer1');
+          setLayerNumber(1);
+          storage
+            .ref()
+            .child(`maps/${data.id}`)
+            .listAll()
+            .then((res) => {
+              layerNames.current = [];
+              res.items.forEach((itemRef) => {
+                layerNames.current.push(itemRef.name.replace('.png', ''));
+              });
+            })
+            .catch((res) => displayError({ msg: res.message }));
           storage
             .ref()
             .child(`maps/${data.id}/layer1.png`)
@@ -117,17 +130,6 @@ export const MapScreen = () => {
             .then((url) => {
               RNImage.getSize(url, (width, height) => {
                 RNImageRef.current = { uri: url, width, height };
-              });
-            })
-            .catch((res) => displayError({ msg: res.message }));
-          storage
-            .ref()
-            .child(`maps/${data.id}`)
-            .listAll()
-            .then((res) => {
-              layers.current = [];
-              res.items.forEach((itemRef) => {
-                layers.current.push(itemRef.name.replace('.png', ''));
               });
             })
             .catch((res) => displayError({ msg: res.message }));
@@ -143,6 +145,7 @@ export const MapScreen = () => {
                       photoURL,
                       state,
                       coordinate,
+                      layer,
                       workspace,
                     } = userData.val();
                     if (
@@ -157,6 +160,7 @@ export const MapScreen = () => {
                           email,
                           photoURL,
                           state,
+                          layer,
                           location: coordinate,
                         },
                       }));
@@ -266,85 +270,87 @@ export const MapScreen = () => {
               }
             }}
           />
-          {Object.entries(members).map(([key, val]) => (
-            <UserPin
-              key={key}
-              color={val.state === 'online' ? theme.colors.accent : 'gray'}
-              position={val.location}
-              onPress={() => {
-                presentModalHandler({
-                  snapPoints: [window.height > 800 ? '25%' : '30%'],
-                  component: () => (
-                    <View style={{ paddingHorizontal: 20 }}>
-                      <View
-                        style={{
-                          flexDirection: 'row',
-                          justifyContent: 'flex-start',
-                          alignItems: 'flex-start',
-                        }}
-                      >
-                        <RNImage
+          {Object.entries(members).map(([key, val]) =>
+            val.layer === layerNumber ? (
+              <UserPin
+                key={key}
+                color={val.state === 'online' ? theme.colors.accent : 'gray'}
+                position={val.location}
+                onPress={() => {
+                  presentModalHandler({
+                    snapPoints: [window.height > 800 ? '25%' : '30%'],
+                    component: () => (
+                      <View style={{ paddingHorizontal: 20 }}>
+                        <View
                           style={{
-                            marginRight: 20,
-                            borderRadius: 10,
-                            borderWidth: 0.5,
-                            borderColor: '#ccc',
+                            flexDirection: 'row',
+                            justifyContent: 'flex-start',
+                            alignItems: 'flex-start',
                           }}
-                          width={140}
-                          height={140}
-                          source={{ uri: val.photoURL }}
-                        />
-                        <View style={{ width: window.width - 200 }}>
-                          <Headline>{val.name}</Headline>
-                          <Caption numberOfLines={1} ellipsizeMode="tail">
-                            UID: {key}
-                          </Caption>
-                          <Caption numberOfLines={1} ellipsizeMode="tail">
-                            Email: {val.email}
-                          </Caption>
-                          <View
+                        >
+                          <RNImage
                             style={{
-                              flexDirection: 'row',
-                              alignItems: 'center',
+                              marginRight: 20,
+                              borderRadius: 10,
+                              borderWidth: 0.5,
+                              borderColor: '#ccc',
                             }}
-                          >
+                            width={140}
+                            height={140}
+                            source={{ uri: val.photoURL }}
+                          />
+                          <View style={{ width: window.width - 200 }}>
+                            <Headline>{val.name}</Headline>
+                            <Caption numberOfLines={1} ellipsizeMode="tail">
+                              UID: {key}
+                            </Caption>
+                            <Caption numberOfLines={1} ellipsizeMode="tail">
+                              Email: {val.email}
+                            </Caption>
                             <View
                               style={{
-                                width: 5,
-                                height: 5,
-                                marginRight: 5,
-                                borderRadius: 10,
-                                backgroundColor:
-                                  val.state === 'online' ? 'green' : 'gray',
-                              }}
-                            />
-                            <Text
-                              style={{
-                                color:
-                                  val.state === 'online' ? 'green' : 'gray',
+                                flexDirection: 'row',
+                                alignItems: 'center',
                               }}
                             >
-                              {val.state === 'online'
-                                ? 'オンライン'
-                                : 'オフライン'}
-                            </Text>
+                              <View
+                                style={{
+                                  width: 5,
+                                  height: 5,
+                                  marginRight: 5,
+                                  borderRadius: 10,
+                                  backgroundColor:
+                                    val.state === 'online' ? 'green' : 'gray',
+                                }}
+                              />
+                              <Text
+                                style={{
+                                  color:
+                                    val.state === 'online' ? 'green' : 'gray',
+                                }}
+                              >
+                                {val.state === 'online'
+                                  ? 'オンライン'
+                                  : 'オフライン'}
+                              </Text>
+                            </View>
                           </View>
                         </View>
                       </View>
-                    </View>
-                  ),
-                });
-                setTracking(trackedPos(val.location));
-                setTrackedUser(key);
-                setIsCurrentPos(false);
-              }}
-              onMove={() => {
-                if (trackedUser === key) {
+                    ),
+                  });
                   setTracking(trackedPos(val.location));
-                }
-              }}
-            />
-          ))}
+                  setTrackedUser(key);
+                  setIsCurrentPos(false);
+                }}
+                onMove={() => {
+                  if (trackedUser === key) {
+                    setTracking(trackedPos(val.location));
+                  }
+                }}
+              />
+            ) : null
+          )}
         </View>
       </PanPinchView>
       <View
@@ -359,13 +365,16 @@ export const MapScreen = () => {
           styles.shadow,
         ]}
       >
-        <ToggleButton.Group value={toggle} onValueChange={() => {}}>
-          {layers.current.map((layer, idx) => (
+        <ToggleButton.Group value={`${layerNumber}`} onValueChange={() => {}}>
+          {layerNames.current.map((name, idx) => (
             <ToggleButton
-              color={toggle === layer ? theme.colors.primary : '#999'}
+              color={idx + 1 === layerNumber ? theme.colors.primary : '#999'}
               icon={`numeric-${idx + 1}`}
-              value={layer}
-              onPress={() => setToggle(layer)}
+              value={`${idx + 1}`}
+              onPress={() => {
+                setLayerNumber(idx + 1);
+                closeModalHandler();
+              }}
             />
           ))}
         </ToggleButton.Group>

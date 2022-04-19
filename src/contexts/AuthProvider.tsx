@@ -6,7 +6,7 @@ import React, {
   useState,
 } from 'react';
 import { AppState } from 'react-native';
-import firebase, { auth, db, storage as firestorage } from '../../firebase';
+import firebase, { auth, db } from '../../firebase';
 import { ErrorProps } from '../types';
 import { AsyncStorageContext } from './AsyncStorageProvider';
 import { DialogContext } from './DialogProvider';
@@ -35,7 +35,14 @@ type AuthContextProps = {
   signin: (email: string, password: string) => void;
   signout: () => void;
   update: (
-    type: 'picture' | 'name' | 'email' | 'password' | 'location' | 'state',
+    type:
+      | 'picture'
+      | 'name'
+      | 'email'
+      | 'password'
+      | 'location'
+      | 'state'
+      | 'layer',
     val: any
   ) => Promise<void>;
 };
@@ -61,7 +68,14 @@ export const AuthProvider: FC = ({ children }) => {
   );
 
   const update = async (
-    type: 'picture' | 'name' | 'email' | 'password' | 'location' | 'state',
+    type:
+      | 'picture'
+      | 'name'
+      | 'email'
+      | 'password'
+      | 'location'
+      | 'state'
+      | 'layer',
     val: any
   ) => {
     auth.onAuthStateChanged((user) => {
@@ -136,6 +150,9 @@ export const AuthProvider: FC = ({ children }) => {
           case 'state':
             db.ref('users').child(user.uid).update({ state: val });
             break;
+          case 'layer':
+            db.ref('users').child(user.uid).update({ layer: val });
+            break;
           default:
             break;
         }
@@ -153,6 +170,7 @@ export const AuthProvider: FC = ({ children }) => {
       photoURL:
         'https://firebasestorage.googleapis.com/v0/b/firecommit-1e1d5.appspot.com/o/users%2Ficon%2Fdefault_user.png?alt=media&token=8f30cf5a-db74-4a09-b4e6-ec26670ba538',
       state: 'online',
+      layer: 1,
       coordinate: {
         x: 0,
         y: 0,
