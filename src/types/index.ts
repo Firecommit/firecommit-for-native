@@ -3,6 +3,7 @@ import {
   NativeStackNavigationOptions,
   NativeStackScreenProps,
 } from '@react-navigation/native-stack';
+import {StackNavigationProp} from '@react-navigation/stack';
 
 export type StackParamList = {
   landing: undefined;
@@ -11,6 +12,7 @@ export type StackParamList = {
 };
 
 export type NavigatesProps = NativeStackScreenProps<StackParamList>;
+export type useNavigationProps = StackNavigationProp<StackParamList>;
 
 export type NavigatesType<T extends ParamListBase> = Array<{
   name: string;

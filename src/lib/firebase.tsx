@@ -12,7 +12,13 @@ import {
   REACT_APP_APP_ID,
   REACT_APP_MEASUREMENT_ID,
 } from '@env';
-import {useState} from 'react';
+import {useEffect, useState} from 'react';
+import {
+  getUser,
+  signinWithEmailAndPassword,
+  signoutFromCurrentUser,
+  signupWithEmailAndPassword,
+} from '&/features/auth';
 
 const config = {
   apiKey: REACT_APP_API_KEY,
@@ -31,11 +37,18 @@ const db = firebase.database(app);
 const storage = firebase.storage(app);
 
 const useAuth = () => {
-  const [user, setUser] = useState<firebase.User | null>(null);
-  auth.onAuthStateChanged(res => {
-    if (res) setUser(res);
-  });
-  return {user};
+  const [user, setUser] = useState(getUser());
+  useEffect(() => {
+    auth.onAuthStateChanged(userCredential => {
+      setUser(userCredential);
+    });
+  }, []);
+  return {
+    user,
+    signin: signinWithEmailAndPassword,
+    signup: signupWithEmailAndPassword,
+    signout: signoutFromCurrentUser,
+  };
 };
 
 export default firebase;

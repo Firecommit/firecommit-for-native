@@ -2,12 +2,15 @@ import React from 'react';
 import {lazyImport} from '&/utils/lazyImport';
 import {StackParamList, NavigatesType} from '&/types';
 
-const {AuthRoutes} = lazyImport(() => import('&/features/auth'), 'AuthRoutes');
+const {AuthNavigates} = lazyImport(
+  () => import('&/features/auth'),
+  'AuthNavigates',
+);
 
 export const publicNavigates: NavigatesType<StackParamList> = [
   {
     name: 'auth',
-    component: AuthRoutes,
+    component: AuthNavigates,
     options: {headerShown: false},
   },
 ];
