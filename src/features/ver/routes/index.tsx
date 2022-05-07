@@ -1,17 +1,16 @@
 import React from 'react';
 import {Text, View} from 'react-native';
 import {Button} from 'react-native-paper';
-import {useAuth} from '&/lib/firebase';
+import {useAuth} from '&/lib/auth';
 
-export const VerRoutes = () => {
+export const VerNavigates = () => {
   const {signout} = useAuth();
-
   return (
     <View style={{flex: 1, alignItems: 'center', justifyContent: 'center'}}>
       <Text>App Page</Text>
       <Button
-        onPress={async () => {
-          await signout();
+        onPress={() => {
+          signout();
         }}>
         サインアウト
       </Button>

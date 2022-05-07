@@ -4,3 +4,4 @@ export * from './api/signup';
 export * from './api/signout';
 
 export * from './routes';
+export * from './types';

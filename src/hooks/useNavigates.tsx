@@ -1,5 +1,5 @@
 import React from 'react';
-import {NavigationContainer, ParamListBase} from '@react-navigation/native';
+import {ParamListBase} from '@react-navigation/native';
 import {createNativeStackNavigator} from '@react-navigation/native-stack';
 import {NavigatesType} from '&/types';
 
@@ -9,17 +9,15 @@ export const useNavigates = <T extends ParamListBase>(
 ) => {
   const Stack = createNativeStackNavigator<T>();
   return (
-    <NavigationContainer>
-      <Stack.Navigator initialRouteName={init}>
-        {navigates.map(nav => (
-          <Stack.Screen
-            key={nav.name}
-            name={nav.name}
-            component={nav.component}
-            options={nav.options}
-          />
-        ))}
-      </Stack.Navigator>
-    </NavigationContainer>
+    <Stack.Navigator initialRouteName={init}>
+      {navigates.map(nav => (
+        <Stack.Screen
+          key={nav.name}
+          name={nav.name}
+          component={nav.component}
+          options={nav.options}
+        />
+      ))}
+    </Stack.Navigator>
   );
 };

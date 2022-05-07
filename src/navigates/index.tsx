@@ -1,23 +1,30 @@
-import React from 'react';
+import React, {useEffect, useState} from 'react';
 
+import {StackParamList} from '&/types';
+import {useAuth} from '&/lib/auth';
 import {useNavigates} from '&/hooks/useNavigates';
+
 import {publicNavigates} from './public';
 import {protectedNavigates} from './protected';
 import {Landing} from '&/features/misc';
-import {useAuth} from '&/lib/firebase';
-import {NavigatesType, StackParamList} from '&/types';
 
 export const AppNavigates = () => {
-  const auth = useAuth();
+  const {user} = useAuth();
+  const [load, setLoad] = useState(false);
 
-  const commonNavigates: NavigatesType<StackParamList> = [
+  useEffect(() => {
+    setTimeout(() => {
+      setLoad(true);
+    }, 3000);
+  }, []);
+
+  const commonNavigates = [
     {name: 'landing', component: Landing, options: {headerShown: false}},
   ];
-  const navigates = auth.user ? protectedNavigates : publicNavigates;
+  const navigates = user ? protectedNavigates : publicNavigates;
 
   const element = useNavigates<StackParamList>(
-    [...commonNavigates, ...navigates],
-    'landing',
+    load ? navigates : commonNavigates,
   );
 
   return <>{element}</>;

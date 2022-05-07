@@ -2,7 +2,7 @@ import React, {useState} from 'react';
 import {Keyboard, View} from 'react-native';
 import {Button, Caption, TextInput} from 'react-native-paper';
 import {Link} from '@react-navigation/native';
-import {useAuth} from '&/lib/firebase';
+import {useAuth} from '&/lib/auth';
 
 type SigninFormProps = {
   onSuccess?: () => void;
@@ -37,10 +37,11 @@ export const SigninForm = ({onSuccess}: SigninFormProps) => {
         <Button
           mode="contained"
           dark
-          onPress={async () => {
-            await signin(data);
+          onPress={() => {
             Keyboard.dismiss();
-            if (onSuccess) onSuccess();
+            signin(data).then(() => {
+              if (onSuccess) onSuccess();
+            });
           }}>
           サインイン
         </Button>

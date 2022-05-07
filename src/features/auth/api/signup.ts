@@ -1,14 +1,19 @@
-import firebase, {auth} from '&/lib/firebase';
+import {auth} from '&/lib/firebase';
+import {omitObject} from '&/utils/omitObject';
+import {UserResponse} from '../types';
 
-type signupCredentialsDTO = {
+export type signupCredentialsDTO = {
   email: string;
   password: string;
   firstName: string;
   lastName: string;
 };
 
-export const signupWithEmailAndPassword = (
+export const signupWithEmailAndPassword = async (
   data: signupCredentialsDTO,
-): Promise<firebase.auth.UserCredential> => {
-  return auth.createUserWithEmailAndPassword(data.email, data.password);
+): Promise<UserResponse> => {
+  return {
+    token: omitObject<signupCredentialsDTO>(data, ['firstName', 'lastName']),
+    user: await auth.createUserWithEmailAndPassword(data.email, data.password),
+  };
 };

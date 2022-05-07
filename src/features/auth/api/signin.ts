@@ -1,12 +1,16 @@
-import firebase, {auth} from '&/lib/firebase';
+import {auth} from '&/lib/firebase';
+import {UserResponse} from '../types';
 
-type signinCredentialsDTO = {
+export type signinCredentialsDTO = {
   email: string;
   password: string;
 };
 
-export const signinWithEmailAndPassword = (
+export const signinWithEmailAndPassword = async (
   data: signinCredentialsDTO,
-): Promise<firebase.auth.UserCredential> => {
-  return auth.signInWithEmailAndPassword(data.email, data.password);
+): Promise<UserResponse> => {
+  return {
+    token: data,
+    user: await auth.signInWithEmailAndPassword(data.email, data.password),
+  };
 };

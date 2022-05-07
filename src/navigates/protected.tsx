@@ -3,12 +3,15 @@ import {lazyImport} from '&/utils/lazyImport';
 import {StackParamList, NavigatesType} from '&/types';
 import {Spinner} from '&/components/Spinner';
 
-const {VerRoutes} = lazyImport(() => import('&/features/ver'), 'VerRoutes');
+const {VerNavigates} = lazyImport(
+  () => import('&/features/ver'),
+  'VerNavigates',
+);
 
-const App = () => {
+const App = (props: any) => {
   return (
     <Suspense fallback={<Spinner size="lg" />}>
-      <VerRoutes />
+      <VerNavigates {...props} />
     </Suspense>
   );
 };
