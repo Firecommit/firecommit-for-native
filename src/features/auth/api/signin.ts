@@ -1,13 +1,13 @@
 import {auth} from '&/lib/firebase';
 import {UserResponse} from '../types';
 
-export type signinCredentialsDTO = {
+export type SigninCredentialsDTO = {
   email: string;
   password: string;
 };
 
 export const signinWithEmailAndPassword = async (
-  data: signinCredentialsDTO,
+  data: SigninCredentialsDTO,
 ): Promise<UserResponse> => {
   return {
     token: data,

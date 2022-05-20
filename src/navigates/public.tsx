@@ -1,15 +1,25 @@
 import {lazyImport} from '&/utils/lazyImport';
-import {StackParamList, NavigatesType} from '&/types';
+import {StackNavigatesType} from '&/types';
 
 const {AuthNavigates} = lazyImport(
   () => import('&/features/auth'),
   'AuthNavigates',
 );
 
-export const publicNavigates: NavigatesType<StackParamList> = [
+const {VerNavigates} = lazyImport(
+  () => import('&/features/ver'),
+  'VerNavigates',
+);
+
+export const publicNavigates: StackNavigatesType = [
   {
     name: 'auth',
     component: AuthNavigates,
+    options: {headerShown: false},
+  },
+  {
+    name: 'verify',
+    component: VerNavigates,
     options: {headerShown: false},
   },
 ];

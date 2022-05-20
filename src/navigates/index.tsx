@@ -1,15 +1,17 @@
 import React, {useEffect, useState} from 'react';
 
-import {StackParamList} from '&/types';
 import {useAuth} from '&/lib/auth';
 import {useNavigates} from '&/hooks/useNavigates';
+import {Landing} from '&/features/misc';
+import {StackParamList} from '&/types';
 
 import {publicNavigates} from './public';
 import {protectedNavigates} from './protected';
-import {Landing} from '&/features/misc';
+import {useVerify} from '&/lib/verify';
 
 export const AppNavigates = () => {
   const {user} = useAuth();
+  const {workspace} = useVerify();
   const [load, setLoad] = useState(false);
 
   useEffect(() => {
@@ -21,10 +23,11 @@ export const AppNavigates = () => {
   const commonNavigates = [
     {name: 'landing', component: Landing, options: {headerShown: false}},
   ];
-  const navigates = user ? protectedNavigates : publicNavigates;
+  const navigates = user && workspace ? protectedNavigates : publicNavigates;
 
   const element = useNavigates<StackParamList>(
     load ? navigates : commonNavigates,
+    user ? 'verify' : 'auth',
   );
 
   return <>{element}</>;

@@ -2,7 +2,7 @@ import {auth} from '&/lib/firebase';
 import {omitObject} from '&/utils/omitObject';
 import {UserResponse} from '../types';
 
-export type signupCredentialsDTO = {
+export type SignupCredentialsDTO = {
   email: string;
   password: string;
   firstName: string;
@@ -10,10 +10,10 @@ export type signupCredentialsDTO = {
 };
 
 export const signupWithEmailAndPassword = async (
-  data: signupCredentialsDTO,
+  data: SignupCredentialsDTO,
 ): Promise<UserResponse> => {
   return {
-    token: omitObject<signupCredentialsDTO>(data, ['firstName', 'lastName']),
+    token: omitObject<SignupCredentialsDTO>(data, ['firstName', 'lastName']),
     user: await auth.createUserWithEmailAndPassword(data.email, data.password),
   };
 };

@@ -1,19 +1,21 @@
-import React from 'react';
-import {Text, View} from 'react-native';
-import {Button} from 'react-native-paper';
+import React, {useEffect} from 'react';
+import {createNativeStackNavigator} from '@react-navigation/native-stack';
+import {Login} from './Login';
 import {useAuth} from '&/lib/auth';
+import {StackNavigationProp} from '&/types';
 
-export const VerNavigates = () => {
-  const {signout} = useAuth();
+export const VerNavigates = ({navigation}: StackNavigationProp) => {
+  const {user} = useAuth();
+  const Stack = createNativeStackNavigator();
+  useEffect(() => {
+    if (!user) navigation.navigate('auth');
+  }, []);
+
   return (
-    <View style={{flex: 1, alignItems: 'center', justifyContent: 'center'}}>
-      <Text>App Page</Text>
-      <Button
-        onPress={() => {
-          signout();
-        }}>
-        サインアウト
-      </Button>
-    </View>
+    user && (
+      <Stack.Navigator screenOptions={{headerShown: false}}>
+        <Stack.Screen name="login" component={Login} />
+      </Stack.Navigator>
+    )
   );
 };

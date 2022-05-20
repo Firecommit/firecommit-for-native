@@ -1,7 +1,7 @@
 import firebase from '&/lib/firebase';
-import {signinCredentialsDTO} from '../api/signin';
+import {SigninCredentialsDTO} from '../api/signin';
 
 export type UserResponse = {
-  token: signinCredentialsDTO;
+  token: SigninCredentialsDTO;
   user: firebase.auth.UserCredential;
 };

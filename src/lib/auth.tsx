@@ -6,45 +6,49 @@ import React, {
   useState,
 } from 'react';
 import {
-  signinCredentialsDTO,
   signinWithEmailAndPassword,
   signoutFromCurrentUser,
-  signupCredentialsDTO,
   signupWithEmailAndPassword,
+  SigninCredentialsDTO,
+  SignupCredentialsDTO,
   UserResponse,
 } from '&/features/auth';
 import storage from '&/utils/storage';
 import firebase, {auth} from './firebase';
+import {omitObject} from '&/utils/omitObject';
 
-const handleUserResponse = (data: UserResponse) => {
+const handleUserResponse = async (data: UserResponse) => {
   const {token, user} = data;
-  storage.setToken(JSON.stringify(token));
+  const prevToken = await storage.getToken();
+  storage.setToken({...prevToken, ...token});
   return user;
 };
 
 const loadUser = async () => {
-  const data = JSON.parse(await storage.getToken());
-  if (data) {
-    const {user} = await signinWithEmailAndPassword(data);
+  const data = await storage.getToken();
+  const authData = data && omitObject(data, ['uid', 'code']);
+  if (authData && authData.email && authData.password) {
+    const {user} = await signinWithEmailAndPassword(authData);
     return user;
   }
   return null;
 };
 
-const signinFn = async (data: signinCredentialsDTO) => {
+const signinFn = async (data: SigninCredentialsDTO) => {
   const response = await signinWithEmailAndPassword(data);
-  const user = handleUserResponse(response);
+  const user = await handleUserResponse(response);
   return user;
 };
 
-const signupFn = async (data: signupCredentialsDTO) => {
+const signupFn = async (data: SignupCredentialsDTO) => {
   const response = await signupWithEmailAndPassword(data);
-  const user = handleUserResponse(response);
+  const user = await handleUserResponse(response);
   return user;
 };
 
-const signoutFn = () => {
-  storage.clearToken();
+const signoutFn = async () => {
+  const prevToken = await storage.getToken();
+  storage.setToken({...prevToken, email: '', password: ''});
   signoutFromCurrentUser();
 };
 
@@ -82,7 +86,7 @@ const AuthProvider = ({children}: AuthProviderProps) => {
   const value = useMemo(() => ({user}), [user]);
   return (
     <AuthContext.Provider value={value}>
-      {load ? children : null}
+      {load && children}
     </AuthContext.Provider>
   );
 };

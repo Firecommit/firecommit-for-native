@@ -1,7 +1,7 @@
-export const omitObject = <T>(obj: T, keys: Array<keyof T>) => {
-  const result = {...obj};
+export const omitObject = <T, K extends keyof T>(obj: T, keys: Array<K>) => {
+  const res = obj;
   keys.forEach(key => {
-    delete result[key];
+    delete res[key];
   });
-  return result;
+  return res as Omit<T, K>;
 };
