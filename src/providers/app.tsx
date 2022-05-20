@@ -1,5 +1,7 @@
 import React, {ReactNode, Suspense} from 'react';
 import {NavigationContainer} from '@react-navigation/native';
+import {SafeAreaProvider} from 'react-native-safe-area-context';
+import {DefaultTheme, Provider as PaperProvider} from 'react-native-paper';
 import {Spinner} from '&/components/Spinner';
 import {AuthProvider} from '&/lib/auth';
 import {VerifyProvider} from '&/lib/verify';
@@ -9,13 +11,26 @@ type AppProviderProps = {
 };
 
 export const AppProvider = ({children}: AppProviderProps) => {
+  const theme = {
+    ...DefaultTheme,
+    roundness: 2,
+    colors: {
+      ...DefaultTheme.colors,
+      primary: '#FC8132',
+      accent: '#329CFC',
+    },
+  };
   return (
     <Suspense fallback={<Spinner size="lg" />}>
-      <AuthProvider>
-        <VerifyProvider>
-          <NavigationContainer>{children}</NavigationContainer>
-        </VerifyProvider>
-      </AuthProvider>
+      <SafeAreaProvider>
+        <PaperProvider theme={theme}>
+          <AuthProvider>
+            <VerifyProvider>
+              <NavigationContainer>{children}</NavigationContainer>
+            </VerifyProvider>
+          </AuthProvider>
+        </PaperProvider>
+      </SafeAreaProvider>
     </Suspense>
   );
 };

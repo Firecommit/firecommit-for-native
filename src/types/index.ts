@@ -1,11 +1,8 @@
-import {BottomTabNavigationOptions} from '@react-navigation/bottom-tabs';
 import {
   NativeStackNavigationOptions,
   NativeStackScreenProps,
 } from '@react-navigation/native-stack';
-import firebase from '&/lib/firebase';
-import {WorkspaceCredentialsDTO} from '&/features/ver';
-import {SigninCredentialsDTO} from '&/features/auth';
+import {MaterialBottomTabNavigationOptions} from '@react-navigation/material-bottom-tabs';
 
 export type StackParamList = {
   landing: undefined;
@@ -26,6 +23,6 @@ export type StackNavigatesType = Array<{
 export type TabNavigatesType = Array<{
   name: string;
   component: React.ComponentType<any>;
-  options?: BottomTabNavigationOptions;
+  options?: MaterialBottomTabNavigationOptions;
   children?: TabNavigatesType;
 }>;
