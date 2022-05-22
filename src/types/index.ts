@@ -2,7 +2,10 @@ import {
   NativeStackNavigationOptions,
   NativeStackScreenProps,
 } from '@react-navigation/native-stack';
-import {MaterialBottomTabNavigationOptions} from '@react-navigation/material-bottom-tabs';
+import {
+  MaterialBottomTabNavigationOptions,
+  MaterialBottomTabScreenProps,
+} from '@react-navigation/material-bottom-tabs';
 
 export type StackParamList = {
   landing: undefined;
@@ -11,7 +14,7 @@ export type StackParamList = {
   verify: undefined;
 };
 
-export type StackNavigationProp = NativeStackScreenProps<StackParamList>;
+export type StackScreenProps = NativeStackScreenProps<StackParamList>;
 
 export type StackNavigatesType = Array<{
   name: string;
@@ -19,6 +22,13 @@ export type StackNavigatesType = Array<{
   options?: NativeStackNavigationOptions;
   children?: StackNavigatesType;
 }>;
+
+export type TabParamList = {
+  map: undefined;
+  profile: undefined;
+};
+
+export type TabScreenProp = MaterialBottomTabScreenProps<TabParamList>;
 
 export type TabNavigatesType = Array<{
   name: string;

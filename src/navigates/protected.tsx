@@ -8,7 +8,7 @@ export const protectedNavigates: StackNavigatesType = [
     name: 'app',
     component: AppContent,
     options: {
-      header: () => <AppHeader />,
+      headerShown: false,
     },
   },
 ];

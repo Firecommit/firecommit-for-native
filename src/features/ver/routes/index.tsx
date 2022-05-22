@@ -2,9 +2,9 @@ import React, {useEffect} from 'react';
 import {createNativeStackNavigator} from '@react-navigation/native-stack';
 import {Login} from './Login';
 import {useAuth} from '&/lib/auth';
-import {StackNavigationProp} from '&/types';
+import {StackScreenProps} from '&/types';
 
-export const VerNavigates = ({navigation}: StackNavigationProp) => {
+export const VerNavigates = ({navigation}: StackScreenProps) => {
   const {user} = useAuth();
   const Stack = createNativeStackNavigator();
   useEffect(() => {
