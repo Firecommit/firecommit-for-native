@@ -13,7 +13,7 @@ export const signupWithEmailAndPassword = async (
   data: SignupCredentialsDTO,
 ): Promise<UserResponse> => {
   return {
-    token: omitObject<SignupCredentialsDTO>(data, ['firstName', 'lastName']),
+    token: omitObject(data, ['firstName', 'lastName']),
     user: await auth.createUserWithEmailAndPassword(data.email, data.password),
   };
 };

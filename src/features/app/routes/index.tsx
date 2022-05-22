@@ -2,7 +2,7 @@ import React from 'react';
 import {createMaterialBottomTabNavigator} from '@react-navigation/material-bottom-tabs';
 import {useTheme} from 'react-native-paper';
 import {Map} from '&/features/map';
-import {Profile} from '&/features/users';
+import {UserNavigates} from '&/features/users';
 
 export const AppContent = () => {
   const theme = useTheme();
@@ -20,7 +20,7 @@ export const AppContent = () => {
       />
       <Tab.Screen
         name="profile"
-        component={Profile}
+        component={UserNavigates}
         options={{tabBarIcon: 'account'}}
       />
     </Tab.Navigator>

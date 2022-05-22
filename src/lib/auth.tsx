@@ -58,10 +58,12 @@ type AuthProviderProps = {
 
 type AuthContextTypes = {
   user: firebase.User | null;
+  setUser: React.Dispatch<React.SetStateAction<firebase.User | null>>;
 };
 
 const AuthContext = createContext<AuthContextTypes>({
   user: null,
+  setUser: () => {},
 });
 
 const useAuth = () => {
@@ -83,7 +85,7 @@ const AuthProvider = ({children}: AuthProviderProps) => {
       setUser(state);
     });
   }, []);
-  const value = useMemo(() => ({user}), [user]);
+  const value = useMemo(() => ({user, setUser}), [user]);
   return (
     <AuthContext.Provider value={value}>
       {load && children}
@@ -91,4 +93,4 @@ const AuthProvider = ({children}: AuthProviderProps) => {
   );
 };
 
-export {AuthProvider, useAuth};
+export {AuthProvider, AuthContext, useAuth};

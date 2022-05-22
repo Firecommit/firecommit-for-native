@@ -1,12 +1,47 @@
+import {createNativeStackNavigator} from '@react-navigation/native-stack';
 import React from 'react';
-import {View} from 'react-native';
-import {Text} from 'react-native-paper';
-import {TabScreenProp} from '&/types';
+import {AppHeader} from '&/components/AppHeader';
+import {Account} from './Account';
+import {Picture} from './Picture';
+import {Username} from './Username';
+import {Email} from './Email';
+import {Password} from './Password';
 
-export const Profile = ({route, navigation}: TabScreenProp) => {
+export const UserNavigates = () => {
+  const Stack = createNativeStackNavigator();
+
   return (
-    <View style={{flex: 1, alignItems: 'center', justifyContent: 'center'}}>
-      <Text>Profile Page</Text>
-    </View>
+    <Stack.Navigator
+      initialRouteName="account"
+      screenOptions={{
+        // eslint-disable-next-line react/no-unstable-nested-components
+        header: props => <AppHeader {...props} />,
+      }}>
+      <Stack.Screen
+        name="account"
+        component={Account}
+        options={{title: 'アカウント設定'}}
+      />
+      <Stack.Screen
+        name="picture"
+        component={Picture}
+        options={{title: 'アイコン画像設定'}}
+      />
+      <Stack.Screen
+        name="username"
+        component={Username}
+        options={{title: 'ユーザー名設定'}}
+      />
+      <Stack.Screen
+        name="email"
+        component={Email}
+        options={{title: 'メールアドレス設定'}}
+      />
+      <Stack.Screen
+        name="password"
+        component={Password}
+        options={{title: 'パスワード設定'}}
+      />
+    </Stack.Navigator>
   );
 };
