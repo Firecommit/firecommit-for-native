@@ -81,9 +81,10 @@ const AuthProvider = ({children}: AuthProviderProps) => {
   const [load, setLoad] = useState(false);
   useEffect(() => {
     loadUser().finally(() => setLoad(true));
-    auth.onAuthStateChanged(state => {
+    const subscribe = auth.onAuthStateChanged(state => {
       setUser(state);
     });
+    return () => subscribe();
   }, []);
   const value = useMemo(() => ({user, setUser}), [user]);
   return (

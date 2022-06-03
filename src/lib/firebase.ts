@@ -12,19 +12,17 @@ import {
   REACT_APP_APP_ID,
   REACT_APP_MEASUREMENT_ID,
 } from '@env';
-import {useContext} from 'react';
 import {
   updateEmail,
-  UpdateEmailDTO,
   updateName,
-  UpdateNameDTO,
   updatePassword,
-  UpdatePasswordDTO,
   updatePicture,
+  UpdateEmailDTO,
+  UpdateNameDTO,
+  UpdatePasswordDTO,
   UpdatePictureDTO,
 } from '&/features/users';
 import asyncStorage from '&/utils/storage';
-import {AuthContext} from './auth';
 
 const config = {
   apiKey: REACT_APP_API_KEY,
@@ -43,23 +41,18 @@ const db = firebase.database(app);
 const storage = firebase.storage(app);
 
 export const useUpdate = () => {
-  const {user, setUser} = useContext(AuthContext);
   const pictureFn = async (data: UpdatePictureDTO) => {
     await updatePicture(data);
-    setUser(u => u && {...u, photoURL: data.value});
   };
 
   const nameFn = async (data: UpdateNameDTO) => {
-    const {firstName, lastName} = data.value;
     await updateName(data);
-    setUser(u => u && {...u, displayName: lastName + firstName});
   };
 
   const emailFn = async (data: UpdateEmailDTO) => {
     await updateEmail(data);
     const prevToken = await asyncStorage.getToken();
     asyncStorage.setToken({...prevToken, email: data.value});
-    setUser(u => u && {...u, email: data.value});
   };
 
   const passwordFn = async (data: UpdatePasswordDTO) => {
