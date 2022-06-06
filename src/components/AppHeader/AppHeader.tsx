@@ -1,14 +1,16 @@
 import React from 'react';
-import {FlexAlignType, Image, TouchableOpacity, View} from 'react-native';
+import {Image, TouchableOpacity, View} from 'react-native';
 import {Appbar, useTheme} from 'react-native-paper';
 import {DrawerHeaderProps} from '@react-navigation/drawer';
 import {NativeStackHeaderProps} from '@react-navigation/native-stack';
+import {useVerify} from '&/lib/verify';
 
 type AppHeaderProps = (NativeStackHeaderProps | DrawerHeaderProps) & {
   type: 'stack' | 'drawer' | 'tab';
 };
 
 export const AppHeader = ({type, ...props}: AppHeaderProps) => {
+  const {workspace} = useVerify();
   const theme = useTheme();
   if (type === 'stack') {
     const {options, route, navigation} = props as NativeStackHeaderProps;
@@ -37,14 +39,16 @@ export const AppHeader = ({type, ...props}: AppHeaderProps) => {
           <TouchableOpacity onPress={navigation.openDrawer}>
             <Image
               style={{
-                borderWidth: 0.5,
+                borderWidth: 1,
                 borderColor: '#ccc',
                 borderRadius: 5,
                 width: 40,
                 height: 40,
               }}
               source={{
-                uri: 'https://firebasestorage.googleapis.com/v0/b/firecommit-1e1d5.appspot.com/o/users%2Ficon%2Fdefault_user.png?alt=media&token=8f30cf5a-db74-4a09-b4e6-ec26670ba538',
+                uri:
+                  workspace?.iconURL ||
+                  'https://firebasestorage.googleapis.com/v0/b/firecommit-1e1d5.appspot.com/o/users%2Ficon%2Fdefault_user.png?alt=media&token=8f30cf5a-db74-4a09-b4e6-ec26670ba538',
               }}
             />
           </TouchableOpacity>
