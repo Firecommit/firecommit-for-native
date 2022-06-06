@@ -6,9 +6,11 @@ import React, {
   useState,
 } from 'react';
 import {
+  getWorkspacesWithUserId,
   loginWithUserIdAndInviteCode,
   logoutFromCurrentWorkspace,
   WorkspaceCredentialsDTO,
+  WorkspaceListResponse,
   WorkspaceObjectType,
   WorkspaceResponse,
 } from '&/features/ver';
@@ -28,7 +30,8 @@ const loadWorkspace = async () => {
   const verData = data && omitObject(data, ['email', 'password']);
   if (verData && verData.uid && verData.code) {
     const {workspace} = await loginWithUserIdAndInviteCode(verData);
-    return workspace;
+    const workspaces = await getWorkspacesWithUserId({uid: verData.uid});
+    return {workspace, workspaces};
   }
   return null;
 };
@@ -54,16 +57,18 @@ type VerifyContextTypes = {
   setWorkspace: React.Dispatch<
     React.SetStateAction<WorkspaceObjectType | null>
   >;
+  workspaces: WorkspaceListResponse | null;
 };
 
 export const VerifyContext = createContext<VerifyContextTypes>({
   workspace: null,
   setWorkspace: () => {},
+  workspaces: null,
 });
 
 const useVerify = () => {
   const {user} = useAuth();
-  const {workspace, setWorkspace} = useContext(VerifyContext);
+  const {workspace, setWorkspace, workspaces} = useContext(VerifyContext);
 
   const login = async (data: WorkspaceCredentialsDTO) => {
     const res = await loginFn(data);
@@ -74,8 +79,10 @@ const useVerify = () => {
     await logoutFn({uid: `${user?.uid}`, code: `${workspace?.id}`});
     setWorkspace(null);
   };
+
   return {
     workspace,
+    workspaces,
     login,
     logout,
   };
@@ -83,13 +90,24 @@ const useVerify = () => {
 
 const VerifyProvider = ({children}: VerifyProviderProps) => {
   const [workspace, setWorkspace] = useState<WorkspaceObjectType | null>(null);
+  const [workspaces, setWorkspaces] = useState<WorkspaceListResponse | null>(
+    null,
+  );
   const [load, setLoad] = useState(false);
   useEffect(() => {
     loadWorkspace()
-      .then(state => setWorkspace(state))
+      .then(res => {
+        if (res) {
+          setWorkspace(res.workspace);
+          setWorkspaces(res.workspaces);
+        }
+      })
       .finally(() => setLoad(true));
   }, []);
-  const value = useMemo(() => ({workspace, setWorkspace}), [workspace]);
+  const value = useMemo(
+    () => ({workspace, setWorkspace, workspaces}),
+    [workspace, workspaces],
+  );
   return (
     <VerifyContext.Provider value={value}>
       {load && children}

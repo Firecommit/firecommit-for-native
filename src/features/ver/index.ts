@@ -1,3 +1,4 @@
+export * from './api/getWorkspaces';
 export * from './api/login';
 export * from './api/logout';
 

@@ -1,7 +1,7 @@
 import React from 'react';
 import {createMaterialBottomTabNavigator} from '@react-navigation/material-bottom-tabs';
 import {useTheme} from 'react-native-paper';
-import {Map} from '&/features/map';
+import {MapNavigates} from '&/features/map';
 import {UserNavigates} from '&/features/users';
 
 export const AppContent = () => {
@@ -15,7 +15,7 @@ export const AppContent = () => {
       barStyle={{backgroundColor: 'white', height: 82}}>
       <Tab.Screen
         name="map"
-        component={Map}
+        component={MapNavigates}
         options={{tabBarIcon: 'google-maps'}}
       />
       <Tab.Screen

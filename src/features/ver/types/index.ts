@@ -21,3 +21,5 @@ export type WorkspaceCredentialsDTO = {
   uid: string;
   code: string;
 };
+
+export type WorkspaceListResponse = Array<WorkspaceObjectType>;

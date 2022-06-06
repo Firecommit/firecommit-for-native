@@ -15,7 +15,7 @@ export const UserNavigates = () => {
       initialRouteName="account"
       screenOptions={{
         // eslint-disable-next-line react/no-unstable-nested-components
-        header: props => <AppHeader {...props} />,
+        header: props => <AppHeader type="stack" {...props} />,
       }}>
       <Stack.Screen
         name="account"
