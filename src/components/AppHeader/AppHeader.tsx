@@ -1,42 +1,61 @@
 import React from 'react';
+import {FlexAlignType, Image, TouchableOpacity, View} from 'react-native';
+import {Appbar, useTheme} from 'react-native-paper';
+import {DrawerHeaderProps} from '@react-navigation/drawer';
 import {NativeStackHeaderProps} from '@react-navigation/native-stack';
-import {Image, TouchableOpacity, View} from 'react-native';
-import {Appbar, Title, useTheme} from 'react-native-paper';
 
-type AppHeaderProps = NativeStackHeaderProps;
+type AppHeaderProps = (NativeStackHeaderProps | DrawerHeaderProps) & {
+  type: 'stack' | 'drawer' | 'tab';
+};
 
-export const AppHeader = (props: AppHeaderProps) => {
+export const AppHeader = ({type, ...props}: AppHeaderProps) => {
   const theme = useTheme();
-  const {options, route, navigation} = props;
-  return (
-    <Appbar.Header
-      style={{zIndex: 100, paddingHorizontal: 16}}
-      theme={{colors: {primary: theme.colors.surface}}}>
-      {false && (
-        <>
-          <View style={{marginRight: 8}}>
-            <TouchableOpacity onPress={() => {}}>
-              <Image
-                style={{
-                  borderWidth: 0.5,
-                  borderColor: '#ccc',
-                  borderRadius: 5,
-                  width: 40,
-                  height: 40,
-                }}
-                source={{
-                  uri: 'https://firebasestorage.googleapis.com/v0/b/firecommit-1e1d5.appspot.com/o/users%2Ficon%2Fdefault_user.png?alt=media&token=8f30cf5a-db74-4a09-b4e6-ec26670ba538',
-                }}
-              />
-            </TouchableOpacity>
-          </View>
-          <Title>{options.title}</Title>
-        </>
-      )}
-      {route.name !== 'account' && navigation.canGoBack() && (
-        <Appbar.BackAction onPress={() => navigation.goBack()} />
-      )}
-      <Appbar.Content title={<Title>{options.title}</Title>} />
-    </Appbar.Header>
-  );
+  if (type === 'stack') {
+    const {options, route, navigation} = props as NativeStackHeaderProps;
+    return (
+      <Appbar.Header
+        style={{zIndex: 100, paddingHorizontal: 16}}
+        theme={{colors: {primary: theme.colors.surface}}}>
+        {route.name !== 'account' && navigation.canGoBack() && (
+          <Appbar.BackAction onPress={navigation.goBack} />
+        )}
+        <Appbar.Content
+          style={{alignItems: 'center'}}
+          titleStyle={{fontWeight: 'bold'}}
+          title={options.title}
+        />
+      </Appbar.Header>
+    );
+  }
+  if (type === 'drawer') {
+    const {options, navigation} = props as DrawerHeaderProps;
+    return (
+      <Appbar.Header
+        style={{zIndex: 100, paddingHorizontal: 16}}
+        theme={{colors: {primary: theme.colors.surface}}}>
+        <View>
+          <TouchableOpacity onPress={navigation.openDrawer}>
+            <Image
+              style={{
+                borderWidth: 0.5,
+                borderColor: '#ccc',
+                borderRadius: 5,
+                width: 40,
+                height: 40,
+              }}
+              source={{
+                uri: 'https://firebasestorage.googleapis.com/v0/b/firecommit-1e1d5.appspot.com/o/users%2Ficon%2Fdefault_user.png?alt=media&token=8f30cf5a-db74-4a09-b4e6-ec26670ba538',
+              }}
+            />
+          </TouchableOpacity>
+        </View>
+        <Appbar.Content
+          style={{alignItems: 'flex-start'}}
+          titleStyle={{fontWeight: 'bold'}}
+          title={options.title}
+        />
+      </Appbar.Header>
+    );
+  }
+  return null;
 };
