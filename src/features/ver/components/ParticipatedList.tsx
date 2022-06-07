@@ -20,6 +20,7 @@ export const ParticipatedList = ({onPress}: ParticipatedListProps) => {
               key={item.id}
               title={item.name}
               subTitle={item.id}
+              iconURL={item.iconURL}
               onPress={() => onPress && onPress(item.id)}
             />
           ))}

@@ -6,6 +6,7 @@ import {ActionSheetProvider} from '@expo/react-native-action-sheet';
 import {Spinner} from '&/components/Spinner';
 import {AuthProvider} from '&/lib/auth';
 import {VerifyProvider} from '&/lib/verify';
+import {BottomSheetProvider} from '&/lib/bottom-sheet';
 
 type AppProviderProps = {
   children: ReactNode;
@@ -28,7 +29,9 @@ export const AppProvider = ({children}: AppProviderProps) => {
           <ActionSheetProvider>
             <AuthProvider>
               <VerifyProvider>
-                <NavigationContainer>{children}</NavigationContainer>
+                <BottomSheetProvider>
+                  <NavigationContainer>{children}</NavigationContainer>
+                </BottomSheetProvider>
               </VerifyProvider>
             </AuthProvider>
           </ActionSheetProvider>

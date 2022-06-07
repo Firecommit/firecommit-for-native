@@ -1,21 +1,31 @@
 /* eslint-disable react/no-unstable-nested-components */
 import {useActionSheet} from '@expo/react-native-action-sheet';
 import {DrawerItem} from '@react-navigation/drawer';
-import React from 'react';
+import React, {useEffect} from 'react';
 import {Drawer} from 'react-native-paper';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import {useAuth} from '&/lib/auth';
+import {useBottomSheet} from '&/lib/bottom-sheet';
+import {Login} from '&/features/ver/routes/Login';
 
 export const SidebarFooter = () => {
   const {signout} = useAuth();
   const {showActionSheetWithOptions} = useActionSheet();
+  const {handlePresentModal} = useBottomSheet();
+
   const data = [
     {
       icon: 'plus-circle-outline',
       title: 'マップサーバーを追加する',
-      onPress: () => {},
+      onPress: () =>
+        handlePresentModal({snapPoints: ['100%'], component: Login}),
     },
-    {icon: 'cog-outline', title: '環境設定', onPress: () => {}},
+    {
+      icon: 'cog-outline',
+      title: '環境設定',
+      onPress: () =>
+        handlePresentModal({snapPoints: ['100%'], component: () => <></>}),
+    },
     {
       icon: 'exit-to-app',
       title: 'サインアウト',

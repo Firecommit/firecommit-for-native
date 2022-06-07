@@ -63,26 +63,39 @@ type VerifyContextTypes = {
     React.SetStateAction<WorkspaceObjectType | null>
   >;
   workspaces: WorkspaceListResponse | null;
+  setWorkspaces: React.Dispatch<
+    React.SetStateAction<WorkspaceListResponse | null>
+  >;
 };
 
 export const VerifyContext = createContext<VerifyContextTypes>({
   workspace: null,
   setWorkspace: () => {},
   workspaces: null,
+  setWorkspaces: () => {},
 });
 
 const useVerify = () => {
   const {user} = useAuth();
-  const {workspace, setWorkspace, workspaces} = useContext(VerifyContext);
+  const {workspace, setWorkspace, workspaces, setWorkspaces} =
+    useContext(VerifyContext);
 
   const login = async (data: WorkspaceCredentialsDTO) => {
-    const res = await loginFn(data);
-    setWorkspace(res);
+    const loginRes = await loginFn(data);
+    const workspacesRes = await getWorkspaces({uid: data.uid});
+    setWorkspace(loginRes);
+    setWorkspaces(workspacesRes);
   };
 
-  const logout = async () => {
-    await logoutFn({uid: `${user?.uid}`, code: `${workspace?.id}`});
-    setWorkspace(null);
+  const logout = async (data: WorkspaceCredentialsDTO) => {
+    await logoutFn(data);
+    const workspacesRes = await getWorkspaces({uid: data.uid});
+    if (workspacesRes.length) {
+      if (user) await login({uid: user.uid, code: workspacesRes[0].id});
+    } else {
+      setWorkspace(null);
+      setWorkspaces(null);
+    }
   };
 
   return {
@@ -112,7 +125,7 @@ const VerifyProvider = ({children}: VerifyProviderProps) => {
     }
   }, []);
   const value = useMemo(
-    () => ({workspace, setWorkspace, workspaces}),
+    () => ({workspace, setWorkspace, workspaces, setWorkspaces}),
     [workspace, workspaces],
   );
   return (

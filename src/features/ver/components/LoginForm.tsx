@@ -4,6 +4,7 @@ import {Button, Caption, TextInput} from 'react-native-paper';
 import {useVerify} from '&/lib/verify';
 import {useAuth} from '&/lib/auth';
 import {ParticipatedList} from './ParticipatedList';
+import {useBottomSheet} from '&/lib/bottom-sheet';
 
 type LoginFormProps = {
   onSuccess?: () => void;
@@ -13,6 +14,7 @@ export const LoginForm = ({onSuccess}: LoginFormProps) => {
   const [code, setCode] = useState('');
   const {user} = useAuth();
   const {login} = useVerify();
+  const {handleCloseModal} = useBottomSheet();
   return (
     <View style={{alignItems: 'center'}}>
       <Caption style={{textAlign: 'center'}}>
@@ -35,6 +37,7 @@ export const LoginForm = ({onSuccess}: LoginFormProps) => {
             Keyboard.dismiss();
             login({uid: `${user?.uid}`, code}).then(() => {
               if (onSuccess) onSuccess();
+              handleCloseModal();
             });
           }}
           disabled={!code || !code.match(/\S/g)}>

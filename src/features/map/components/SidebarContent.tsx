@@ -1,7 +1,10 @@
 import {DrawerContentScrollView} from '@react-navigation/drawer';
 import React from 'react';
 import {List} from 'react-native-paper';
-import {useActionSheet} from '@expo/react-native-action-sheet';
+import {
+  ActionSheetOptions,
+  useActionSheet,
+} from '@expo/react-native-action-sheet';
 import Clipboard from '@react-native-clipboard/clipboard';
 import {useVerify} from '&/lib/verify';
 import {useAuth} from '&/lib/auth';
@@ -25,7 +28,7 @@ export const SidebarContent = () => {
               if (user) login({uid: user.uid, code: item.id});
             }}
             onSetting={() => {
-              const option = {
+              const option: ActionSheetOptions = {
                 options: [
                   '招待コードのコピー',
                   'サーバーからログアウト',
@@ -36,7 +39,7 @@ export const SidebarContent = () => {
               };
               const indexFn = (i?: number) => {
                 if (i === 0) Clipboard.setString(item.id);
-                if (i === 1) logout();
+                if (i === 1) if (user) logout({uid: user.uid, code: item.id});
               };
               showActionSheetWithOptions(option, indexFn);
             }}
