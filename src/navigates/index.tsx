@@ -1,5 +1,6 @@
 import React, {useEffect, useState} from 'react';
 
+import {connectActionSheet} from '@expo/react-native-action-sheet';
 import {useAuth} from '&/lib/auth';
 import {useNavigates} from '&/hooks/useNavigates';
 import {Landing} from '&/features/misc';
@@ -9,7 +10,7 @@ import {publicNavigates} from './public';
 import {protectedNavigates} from './protected';
 import {useVerify} from '&/lib/verify';
 
-export const AppNavigates = () => {
+export const AppNavigates = connectActionSheet(() => {
   const {user} = useAuth();
   const {workspace} = useVerify();
   const [load, setLoad] = useState(false);
@@ -31,4 +32,4 @@ export const AppNavigates = () => {
   );
 
   return <>{element}</>;
-};
+});
