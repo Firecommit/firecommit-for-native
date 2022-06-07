@@ -6,6 +6,7 @@ import React, {
   useState,
 } from 'react';
 import {
+  GetAPIWorkspacesDTO,
   getWorkspacesWithUserId,
   loginWithUserIdAndInviteCode,
   logoutFromCurrentWorkspace,
@@ -30,8 +31,7 @@ const loadWorkspace = async () => {
   const verData = data && omitObject(data, ['email', 'password']);
   if (verData && verData.uid && verData.code) {
     const {workspace} = await loginWithUserIdAndInviteCode(verData);
-    const workspaces = await getWorkspacesWithUserId({uid: verData.uid});
-    return {workspace, workspaces};
+    return workspace;
   }
   return null;
 };
@@ -46,6 +46,11 @@ const logoutFn = async (data: WorkspaceCredentialsDTO) => {
   const prevToken = await storage.getToken();
   storage.setToken({...prevToken, uid: '', code: ''});
   logoutFromCurrentWorkspace(data);
+};
+
+const getWorkspaces = async (data: GetAPIWorkspacesDTO) => {
+  const workspaces = await getWorkspacesWithUserId(data);
+  return workspaces;
 };
 
 type VerifyProviderProps = {
@@ -94,15 +99,17 @@ const VerifyProvider = ({children}: VerifyProviderProps) => {
     null,
   );
   const [load, setLoad] = useState(false);
+  const {user} = useAuth();
+
   useEffect(() => {
-    loadWorkspace()
-      .then(res => {
-        if (res) {
-          setWorkspace(res.workspace);
-          setWorkspaces(res.workspaces);
-        }
-      })
-      .finally(() => setLoad(true));
+    if (user) {
+      Promise.all([loadWorkspace(), getWorkspaces({uid: user.uid})])
+        .then(res => {
+          setWorkspace(res[0]);
+          setWorkspaces(res[1]);
+        })
+        .finally(() => setLoad(true));
+    }
   }, []);
   const value = useMemo(
     () => ({workspace, setWorkspace, workspaces}),

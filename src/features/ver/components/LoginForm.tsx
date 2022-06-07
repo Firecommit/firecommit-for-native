@@ -3,7 +3,7 @@ import {Keyboard, View} from 'react-native';
 import {Button, Caption, TextInput} from 'react-native-paper';
 import {useVerify} from '&/lib/verify';
 import {useAuth} from '&/lib/auth';
-import {WorkspaceList} from './WorkspaceList';
+import {ParticipatedList} from './ParticipatedList';
 
 type LoginFormProps = {
   onSuccess?: () => void;
@@ -41,7 +41,11 @@ export const LoginForm = ({onSuccess}: LoginFormProps) => {
           サーバーに参加する
         </Button>
       </View>
-      <WorkspaceList />
+      <ParticipatedList
+        onPress={text => {
+          setCode(text);
+        }}
+      />
     </View>
   );
 };
